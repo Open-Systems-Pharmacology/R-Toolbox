@@ -1,0 +1,178 @@
+require_relative 'scripts/setup'
+require_relative 'scripts/setup'
+require_relative 'scripts/copy-dependencies'
+require_relative 'scripts/wix'
+
+PACKAGE_NAME = 'MoBiToolboxForR'
+PRODUCT_NAME = 'MoBi Toolbox for R'
+MANUFACTURER = 'Open Systems Pharmacology'
+PRODUCT_ID = Utils.uuid.to_s
+
+task :create_setup, [:product_version] do |t, args|
+  @product_version = args.product_version
+  release_version_split= @product_version.split('.')
+  @product_release_version = "#{release_version_split[0]}.#{release_version_split[1]}"
+  @product_full_version = "#{@product_release_version}.#{release_version_split[2]}"
+  @product_full_name = "#{PRODUCT_NAME} #{@product_release_version}"
+  @package_full_name = "#{PACKAGE_NAME}_#{@product_full_version}"
+
+  Rake::Task['execute_light'].invoke
+end
+
+task :create_r_package => [:prepare, :update_package_variables] do
+  command_line = %W[CMD build --resave-data --compact-vignettes --md5 #{toolbox_dir}]
+  Utils.run_cmd 'R', command_line
+
+  command_line = %W[CMD INSTALL --build --clean --resave-data --compact-docs --no-multiarch "#{@package_full_name}.tar.gz"]
+  Utils.run_cmd 'R', command_line 
+
+ add_component_files_to_archive
+end
+
+task :update_package_variables do
+  replacement = {
+    'PACKAGE_NAME' => PACKAGE_NAME,
+    'PRODUCT_NAME' => PRODUCT_NAME,
+    'VERSION' => @product_full_version,
+    'MAINTAINER' => MANUFACTURER,
+    'DATE' => Time.now.strftime('%Y-%m-%d'),
+  }
+
+  Utils.replace_tokens replacement, File.join(toolbox_dir, "DESCRIPTION")
+end
+
+desc "cleanup files before starting compilation"
+task :prepare do
+  FileUtils.rm_rf  deploy_dir
+
+  FileUtils.mkdir_p toolbox_R_dir
+  FileUtils.mkdir_p toolbox_man_dir
+  FileUtils.mkdir_p toolbox_src_dir
+  copy_setup_files
+end
+
+task :execute_candle => :create_r_package do
+  variables = {}
+  variables[:ProductId] =  PRODUCT_ID
+  variables[:ProductName] =  PRODUCT_NAME
+  variables[:Manufacturer] =  MANUFACTURER
+  variables[:ProductVersion] =  @product_version
+  variables[:ProductFullName] =  @product_full_name
+  variables[:ProductReleaseVersion] =  @product_release_version
+  variables[:PackageFullName] =   "#{@package_full_name}.zip"
+
+  all_variables = variables.each.collect do |k, v|
+    "-d#{k}=#{v}"
+  end
+
+  command_line = %W[#{File.join(deploy_dir, "setup.wxs")} -dDeployDir=#{solution_dir} -o #{deploy_dir}/]
+  Utils.run_cmd Wix.candle, command_line + all_variables
+end
+
+
+task :execute_light => :execute_candle do
+  all_wixobj = []
+  Dir.glob("#{deploy_dir}/*.wixobj").each{|f| all_wixobj << f}
+  all_options = %W[-o #{deploy_dir}/#{PACKAGE_NAME}.#{@product_version}.msi -nologo -ext WixUIExtension -ext WixNetFxExtension -sice:ICE61 -spdb -b #{deploy_dir}/ -cultures:en-us]
+  Utils.run_cmd Wix.light, all_wixobj +  all_options
+end
+
+private
+
+def add_component_files_to_archive
+  zip_archive = File.join(solution_dir, "#{@package_full_name}.zip")
+
+  command_line = %W[x #{zip_archive} -o#{solution_dir}]
+  zip command_line
+  FileUtils.rm zip_archive
+
+  packages_dir =  File.join(solution_dir, 'packages')
+  decompressed_dir = File.join(solution_dir, PACKAGE_NAME)
+  decompressed_lib_dir = File.join(decompressed_dir, 'libs', 'i386')
+
+  copy_depdencies packages_dir, decompressed_lib_dir do
+    copy_files 'OSPSuite.SimModel', 'xsd'
+    copy_files 'OSPSuite.SimModelComp', 'xml'
+  end
+
+  command_line = %W[a #{zip_archive} #{decompressed_dir}]
+  zip command_line
+end
+
+def zip(command_line)
+  Utils.run_cmd('7z', command_line) 
+end
+
+def copy_setup_files
+  packages_dir =  File.join(solution_dir, 'packages')
+
+  copy_depdencies setup_dir, deploy_dir do
+    copy_files '**', ['wxs', 'msm', 'rtf', 'bmp']
+  end
+
+  copy_depdencies setup_dir, toolbox_dir do
+    copy_file 'DESCRIPTION'
+    copy_file 'NAMESPACE'
+  end
+
+  architecture = '/**/x86/**/Release'
+  copy_depdencies packages_dir, toolbox_src_dir do
+    copy_files "OSPSuite.SimModelComp#{architecture}", 'dll'
+    copy_files "OSPSuite.SimModel#{architecture}", 'dll'
+    copy_files "OSPSuite.FuncParser#{architecture}", 'dll'
+    copy_files "OSPSuite.SimModelSolver_CVODES282#{architecture}", 'dll'    
+  end
+
+  copy_depdencies lib_dir, toolbox_src_dir do
+    copy_dci_dll
+    copy_dcir_dll
+  end
+
+  copy_depdencies src_dir, toolbox_R_dir do
+    copy_code_R 
+  end
+
+  copy_depdencies setup_dir, toolbox_R_dir do
+    copy_file 'MoBiToolboxForR-internal.R' 
+  end
+ 
+ copy_depdencies src_dir, toolbox_man_dir do
+   copy_manual_rd
+ end
+end
+
+def deploy_dir
+  File.join(setup_dir,"deploy")
+end
+
+def toolbox_dir
+  File.join(deploy_dir, PACKAGE_NAME)
+end
+
+def toolbox_R_dir
+  File.join(toolbox_dir, "R")
+end
+
+def toolbox_man_dir
+  File.join(toolbox_dir, "man")
+end
+
+def toolbox_src_dir
+  File.join(toolbox_dir, "src")
+end
+
+def setup_dir
+  File.join(solution_dir, "setup")
+end
+
+def solution_dir
+  File.dirname(__FILE__)
+end
+
+def src_dir
+  File.join(solution_dir,'src')
+end
+
+def lib_dir
+  File.join(solution_dir,'lib')
+end

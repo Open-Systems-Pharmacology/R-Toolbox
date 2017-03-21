@@ -1,0 +1,6 @@
+[submodule "scripts"]
+	path = scripts
+	url = https://github.com/Open-Systems-Pharmacology/build-scripts.git
+[submodule "lib/DCI"]
+	path = lib/DCI
+	url = https://github.com/Open-Systems-Pharmacology/DCI.git

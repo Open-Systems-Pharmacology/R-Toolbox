@@ -1,0 +1,3 @@
+exportPattern("^[^\\.]")
+useDynLib(DCIR6_0, .registration = TRUE)
+useDynLib(DCIR6_0, RDCI_Configure, RDCI_DestroyAllComponents, RDCI_DestroyComponent, RDCI_GetInputTable, RDCI_GetInputTables, RDCI_GetLastError, RDCI_GetOutputTable, RDCI_GetOutputTables, RDCI_GetParameterTable, RDCI_GetParameterTables, RDCI_Help, RDCI_Invoke, RDCI_LoadComponent, RDCI_LoadInputTable, RDCI_LoadParameterTable, RDCI_LongInf, RDCI_LongNaN, RDCI_LongNegInf, RDCI_ProcessData, RDCI_ProcessMetaData, RDCI_SaveInputTable, RDCI_SaveOutputTable, RDCI_SaveParameterTable, RDCI_SetInputTable, RDCI_SetInputTables, RDCI_SetOutputTable, RDCI_SetOutputTables, RDCI_SetParameterTable, RDCI_SetParameterTables)

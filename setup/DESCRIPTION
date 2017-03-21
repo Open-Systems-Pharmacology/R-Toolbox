@@ -1,0 +1,9 @@
+Package: PACKAGE_NAME
+Type: Package
+Title: PRODUCT_NAME
+Version: VERSION
+Date: DATE
+Maintainer: MAINTAINER <support@systems-biology.com>
+Description: Interfaces PK-Sim/MoBi models with R
+License: GNU GENERAL PUBLIC LICENSE plus CLARIFYING ADDENDUM (https://github.com/Open-Systems-Pharmacology/Suite/blob/master/LICENSE)
+Depends: R(>= 3.3.1)

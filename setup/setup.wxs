@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="$(var.ProductId)" Name="$(var.ProductFullName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="(var.Manufacturer)" UpgradeCode="28865707-AAEA-4A36-B1CE-430EAA7763A7">
+        <Package InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated"/>
+
+       <Condition Message="For a correct installation of the software, administrator rights are necessary. You do not have these rights. Please contact your IT-administrator to carry out the installation">Privileged</Condition>
+
+        <Upgrade Id="28865707-AAEA-4A36-B1CE-430EAA7763A7">
+            <UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND" Minimum="7.0.0" IncludeMinimum="yes" Maximum="$(var.ProductVersion)" IncludeMaximum="no"/>
+        </Upgrade>
+        <!--Setup Properties -->
+        <Property Id="ALLUSERS" Value="1"/>
+        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes"/>
+
+        <?if $(sys.BUILDARCH) = x64 ?>
+        <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+        <?else?>
+        <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+        <?endif?>
+
+      <!--Programm Files -->
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="OSP_SUITE" Name="$(var.Manufacturer)">
+                <Directory Id="INSTALLDIR" Name="$(var.ProductFullName)">
+                    <Component Id='package' Guid='8C755385-9487-4546-AE9C-B14882D8D6B3'>
+                      <File Name='$(var.PackageFullName)' Id='Comp' Source='$(var.DeployDir)/$(var.PackageFullName)' KeyPath='yes' />
+                    </Component>
+
+                </Directory>
+            </Directory>            
+        </Directory>
+
+        <Property Id="ARPHELPLINK" Value="http://www.open-systems-pharmacology.org"/>
+        <Property Id="ARPCONTACT" Value="support@systems-biology.com"/>
+        <Property Id="ARPURLUPDATEINFO" Value="http://www.open-systems-pharmacology.org"/>
+        <Property Id="ARPURLINFOABOUT" Value="http://www.open-systems-pharmacology.org"/>
+
+
+        <Feature Id="Main" Title="$(var.ProductName)" Level="1" Absent="disallow" AllowAdvertise="no">
+            <ComponentRef Id="package" />
+        </Feature>
+
+        <InstallExecuteSequence>
+            <RemoveExistingProducts Before="InstallInitialize"/>
+        </InstallExecuteSequence>
+        <!-- UISection-->
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+        <UIRef Id="WixUI_InstallDir"/>
+        <UIRef Id="WixUI_ErrorProgressText"/>
+        <WixVariable Id="WixUILicenseRtf" Value="EULA.rtf"/>
+        <WixVariable Id="WixUIBannerBmp" Value="Banner.bmp"/>
+    </Product>
+</Wix>
