@@ -180,7 +180,19 @@ initSimulation <- function(XML = "", ParamList = numeric(0), whichInitParam = ""
 	{
 	  stop(.Call("RDCI_GetLastError"));
 	}
-
+	
+	# for the moment set all output variables/observer as persistable, so that their values are accessible after processSimulation
+	# this should be changed in the future to setting only otputs of interest  as persistable 
+	retval = .Call('RDCI_Invoke', DCI_Info$Handle, 'SetAllOutputsPersistable', "");
+	if (is.character(retval) & retval != "") 
+    {
+      stop(retval)
+    }
+	if (retval == 0)
+	{
+      stop("Error in initSimulation: 'SetAllOutputsPersistable' failed.")
+	}
+	
 	# Get tables
 	TableArray <- .Call("RDCI_GetInputTables", as.integer(DCI_Info$Handle), as.integer(1))
 	
