@@ -94,3 +94,19 @@ test.SpecialTimepointsWithAddTimePattern <- function() {
   checkEquals(dci_info$InputTab$TimeSchema$Distribution[2], "Equidistant")
   checkEquals(dci_info$InputTab$TimeSchema$Unit[2], unit[1])
 }
+
+test.SetSimulationTimePointsAndSimulate <- function(){
+  dci_info <- standard_dci_info
+  unit <- dci_info$InputTab$TimeSchema$Unit
+  #first 8 hours hourly 
+  timepoints <- c((0:7)*60)
+  dci_info <- setSimulationTime(c(1:60, timepoints=(0:7)*60), DCI_Info=dci_info)
+  processSimulation(DCI_Info=dci_info)
+  
+  dci_info <- setSimulationTime(c(1:60), DCI_Info=dci_info)
+  processSimulation(DCI_Info=dci_info) # that failes currently with 
+  # "Error in processSimulation(DCI_Info = dci_info) : "
+  # "Unknown interval distribution type passed: ''"
+  
+}
+
