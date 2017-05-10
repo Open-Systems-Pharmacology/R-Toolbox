@@ -47,17 +47,17 @@ test.whichInitParam_none <- function() {
 #   checkEqualsNumeric(length(dci_info$InputTab$VariableParameters$Path), length(dci_info$InputTab$AllParameters$Path[which(dci_info$InputTab$AllParameters$ParameterType != "Formula")]))
 # }
 
-test.Version_4_0 <- function() {
-  checkException(initSimulation(XML = simModelXML, whichInitParam="none", Version="4_0"))
-}
-
-test.Version_4_1 <- function() {
-  checkException(initSimulation(XML = simModelXML, whichInitParam="none", Version="4_1"))
-}
-
-test.Version_5_0 <- function() {
-  checkException(initSimulation(XML = simModelXML, whichInitParam="none", Version="5_0"))
-}
+# test.Version_4_0 <- function() {
+#   checkException(initSimulation(XML = simModelXML, whichInitParam="none", Version="4_0"))
+# }
+# 
+# test.Version_4_1 <- function() {
+#   checkException(initSimulation(XML = simModelXML, whichInitParam="none", Version="4_1"))
+# }
+# 
+# test.Version_5_0 <- function() {
+#   checkException(initSimulation(XML = simModelXML, whichInitParam="none", Version="5_0"))
+# }
 
 test.Version_6_0 <- function() {
   dci_info <- initSimulation(XML = simModelXML, whichInitParam="none", Version="6_0")
