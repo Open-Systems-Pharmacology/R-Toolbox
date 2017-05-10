@@ -11,19 +11,20 @@
 
 require(RUnit, quietly=TRUE)
 require(MoBiToolboxForR)
-simModelXML <- "C:/workspace/MoBi_Toolbox_for_R/R-Toolbox/tests/models/Rabbit Caffein.xml"
+simModelXML <- "tests/models/Rabbit Caffein.xml"
+standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
 standard_dci_info <- processSimulation(DCI_Info = standard_dci_info)
 res = getSimulationResult(DCI_Info=standard_dci_info, path_id = "*Rabbit Caffein|Organism|VenousBlood|Plasma|Caffeine*")
 getPKParameterForConcentration(res[,1], res[,2])
 
 plot(res[,1], res[,2], type = "l")
 
-setwd("tests/")
-source("runit.setSimulationTime.R")
+
+source("tests/runit.setSimulationTime.R")
 test.SetSimulationTimePointsAndSimulate()
 
 # if this works, run
 # edit paths to test directory:
 
-testDir <- "C:/workspace/MoBi_ToolBox_for_R/R-Toolbox/tests"
-source(paste(testDir, "DoRUnitTesting.R", sep = "/"))
+testDir ="test"
+source( "test/DoRUnitTesting.R")
