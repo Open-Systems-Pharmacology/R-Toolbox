@@ -2,3 +2,4 @@ packages/
 setup/deploy/
 MoBiToolBoxForR/
 MoBiToolBoxForR_*
+.Rproj.user
