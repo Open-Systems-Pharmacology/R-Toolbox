@@ -1,9 +1,15 @@
 environment:
-  app_version: '7.1.0'
+  app_version: '7.2.0'
   R_INSTALL_DIR: 'C:\ProgramData\R\'
   R_TOOLS_INSTALL_DIR: 'C:\ProgramData\RTools\'
 
 version: '%app_version%.{build}'
+
+branches:
+  only:
+    - develop
+
+skip_tags: true
 
 skip_commits:
   files:
