@@ -96,6 +96,20 @@ test.CheckParameterInSimulationNoneVariables <- function() {
   checkException(setParameter(value=5, path_id=113, DCI_Info = dci_info, options=options))
 }
 
+
+test.SetParameterEffectOnFormular <- function(){
+  
+  initStruct <- initParameter(initStruct = list(), path_id = "*|my Compound|Effective molecular weight", initializeIfFormula = "withWarning")
+  initStruct <- initParameter(initStruct = initStruct, path_id = "*|my Compound|Br", initializeIfFormula = "withWarning")
+  
+  dci_info <- initSimulation(XML="./models/black american girl.xml", ParamList = initStruct)
+  v = getParameter("*|Effective molecular weight", DCI_Info = dci_info)$Value
+  dci_info = setParameter(value = 10, "*|Br", DCI_Info = dci_info)
+  
+  #after setting the number of Br to 10, the effective weight should decrease
+  checkTrue (getParameter("*|Effective molecular weight", DCI_Info = dci_info)$Value < v)
+}
+
 test.CheckRowIndexWithTableParameters <- function() {
   dci_info <- initSimulation(XML="./models/TableParameters.xml", whichInitParam="all")
   

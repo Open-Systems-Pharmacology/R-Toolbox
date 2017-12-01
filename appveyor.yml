@@ -1,9 +1,15 @@
 environment:
-  app_version: '7.1.0'
+  app_version: '7.2.0'
   R_INSTALL_DIR: 'C:\ProgramData\R\'
   R_TOOLS_INSTALL_DIR: 'C:\ProgramData\RTools\'
 
 version: '%app_version%.{build}'
+
+branches:
+  only:
+    - develop
+
+skip_tags: true
 
 skip_commits:
   files:
@@ -21,7 +27,6 @@ install:
       (new-object net.webclient).DownloadFile(' https://cran.r-project.org/bin/windows/Rtools/Rtools33.exe', 'C:\\Rtools.exe')
 
       Start-Process C:\Rtools.exe -ArgumentList /VERYSILENT, /DIR=$env:R_TOOLS_INSTALL_DIR -Wait      
-
 
 before_build:
   - nuget sources add -name funcparser -source https://ci.appveyor.com/nuget/ospsuite-funcparser 
