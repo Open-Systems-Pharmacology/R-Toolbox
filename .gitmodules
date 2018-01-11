@@ -4,3 +4,6 @@
 [submodule "lib/DCI"]
 	path = lib/DCI
 	url = https://github.com/Open-Systems-Pharmacology/DCI.git
+[submodule "lib/Schema"]
+	path = lib/Schema
+	url = https://github.com/Open-Systems-Pharmacology/OSPSuite.SimModel.Schema.git

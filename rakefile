@@ -124,6 +124,7 @@ def copy_setup_files
   end
 
   copy_depdencies lib_dir, toolbox_src_dir do
+    copy_schema_xsd
     copy_dci_dll
     copy_dcir_dll
   end
