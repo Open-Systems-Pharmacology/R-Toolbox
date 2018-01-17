@@ -34,18 +34,33 @@ findTableIndex <- function(path_id = numeric(0), tableID = numeric(0), isReferen
   		indx <- 1:counts
   		if (path_id != '*')
   		{
+  		  # As escaping of certain symbols in path names had to be done manually in previous releases but is performed
+  		  # automatically now, a warning message is displayed when manual escaping is detected. This warning message
+  		  # should be removed in future.
+  		  for (symbol in c("\\(", "\\)", "\\[", "\\]")){
+  		    if (grepl(symbol, path_id, fixed = TRUE)){
+  		      warning("Escaping of the characters '(', ')', '[', and '[' should not be done manually!", immediate. = TRUE )
+  		      break
+  		    }
+  		  }
         searchValue <- path_id
         searchValue <- gsub('|', '\\|', searchValue, fixed = TRUE)
         searchValue <- gsub('&', '\\&', searchValue, fixed = TRUE)
+        searchValue <- gsub('(', '\\(', searchValue, fixed = TRUE)
+        searchValue <- gsub(')', '\\)', searchValue, fixed = TRUE)
+        searchValue <- gsub('[', '\\[', searchValue, fixed = TRUE)
+        searchValue <- gsub(']', '\\]', searchValue, fixed = TRUE)
         searchValue <- gsub('*', '.*', searchValue, fixed = TRUE)
         searchValue <- paste("^", searchValue, "$", sep="")
         searchPathes <- Table$Path
 
         indx <- grep(searchValue, searchPathes, perl = TRUE)                     
   		}
-    } else
-    {
-      indx <- 0
+    }
+    # If no parameter found, return a zero-lenght integer vector to match the behavior of which().
+    # This way, a not found parameter should be recognized by checking for (length(indx) == 0)
+    else{
+      indx <- integer(0);
     }
 	}
 	return(indx)	
