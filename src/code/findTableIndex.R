@@ -39,7 +39,7 @@ findTableIndex <- function(path_id = numeric(0), tableID = numeric(0), isReferen
   		  # should be removed in future.
   		  for (symbol in c("\\(", "\\)", "\\[", "\\]")){
   		    if (grepl(symbol, path_id, fixed = TRUE)){
-  		      warning("Escaping of the characters '(', ')', '[', and '[' should not be done manually!", immediate. = TRUE )
+  		      warning(paste(path_id, ": Escaping of the characters '(', ')', '[', and '[' in path names should not be done manually!"), immediate. = TRUE )
   		      break
   		    }
   		  }
