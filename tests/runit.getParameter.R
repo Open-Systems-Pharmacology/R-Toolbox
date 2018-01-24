@@ -301,9 +301,39 @@ test.CheckParameterInSimulationNoneVariables <- function() {
 
   checkEquals(names(parameter), c("Value","Index"))
   checkEquals(dci_info$InputTab$AllParameters$Value[parameter$Index], parameter$Value)
+  
+  # Check that an exception is thrown when the parameter does not exist in the simulation
+  checkException(getParameter(path_id=0, DCI_Info = dci_info, options=options))
 
   options <- list(Type="variable")
   checkException(getParameter(path_id=113, DCI_Info = dci_info, options=options))
+}
+
+# Check if a parameter can be found by its given path name when no parameters were initialized explicitely.
+test.CheckParameterInSimulationNoneVariables_byPath <- function() {
+  dci_info <- standard_dci_info
+  options <- list(Type="current")
+  parameter <- getParameter(path_id = "black american girl|Organism|Muscle|Plasma|my Compound|concentration", DCI_Info = dci_info, options=options)
+  
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(dci_info$InputTab$AllParameters$Value[parameter$Index], parameter$Value)
+  
+  # Check that an exception is thrown when the parameter does not exist in the simulation
+  checkException(getParameter(path_id = "black american girl|Organism|nonExistent", DCI_Info = dci_info, options=options))
+  
+  options <- list(Type="variable")
+  checkException(getParameter(path_id = "black american girl|Organism|Muscle|Plasma|my Compound|concentration", DCI_Info = dci_info, options=options))
+}
+
+# Check if a parameter can be found by its given path name when no parameters were initialized explicitely
+# and the path name contains round brackets.
+test.CheckParameterInSimulationNoneVariables_byPathBrackets <- function() {
+  dci_info <- standard_dci_info
+  options <- list(Type="current")
+  parameter <- getParameter(path_id = "black american girl|Organism|pH (plasma)", DCI_Info = dci_info, options=options)
+  
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(dci_info$InputTab$AllParameters$Value[parameter$Index], parameter$Value)
 }
 
 test.CheckTableParameterValueTimeProfile <- function() {
