@@ -57,7 +57,8 @@ getTableParameter <- function(path_id = "*", options = {}, DCI_Info = {})
   
   if (length(indx) == 0)
   {
-    stop(paste("Parameter with path_id", path_id, "does not exist for specified parameter type", options$Type))
+    warning(paste("Table parameter with path_id", path_id, "does not exist for specified parameter type", options$Type))
+    return(list(ID = NULL, Time = NULL, Value = NULL, RestartSolver = NULL));
   }
 
   if (toupper(options$Type) != "REFERENCE")

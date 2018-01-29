@@ -49,7 +49,8 @@ getObserverFormula <- function(path_id = "*", options = {}, DCI_Info = {})
 	
 	if (length(indx) == 0)
 	{
-		stop(paste("Observer with path_id", path_id, "does not exist for specified type", options$Type))
+	warning(paste("Observer with path_id", path_id, "does not exist for specified type", options$Type))
+	  return(list(Value = NULL, Index = NULL));
 	}
   
 	if (toupper(options$Type) != "REFERENCE")

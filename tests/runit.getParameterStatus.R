@@ -1,6 +1,6 @@
-require(RUnit, quietly=TRUE)
-require(MoBiToolboxForR, quietly=TRUE)
-simModelXML <- "./models/TableParameters.xml"
+#require(RUnit, quietly=TRUE)
+#require(MoBiToolboxForR, quietly=TRUE)
+simModelXML <- "./tests/models/TableParameters.xml"
 standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
 
 test.EmptyDCI_Info <- function() {
@@ -26,16 +26,15 @@ test.DefaultOptions <- function() {
   checkEquals(names(parameterStatus$SpeciesScaleFactors), c("Value", "Index"))
   checkEquals(names(parameterStatus$SimulationTime), c("Time", "Pattern"))
   
-  checkEquals(length(parameterStatus$Parameters$Value), 0)
-  checkEquals(parameterStatus$Parameters$Index, 0)
+  checkEquals(length(parameterStatus$Parameters$Index), 0)
   checkEquals(length(parameterStatus$TableParameters$ID), 0)
   checkEquals(length(parameterStatus$TableParameters$Time), 0)
   checkEquals(length(parameterStatus$TableParameters$Value), 0)
   checkEquals(length(parameterStatus$TableParameters$RestartSolver), 0)
   checkEquals(length(parameterStatus$SpeciesInitialValues$Value), 0)
-  checkEquals(parameterStatus$SpeciesInitialValues$Index, 0)
+  checkEquals(length(parameterStatus$SpeciesInitialValues$Index), 0)
   checkEquals(length(parameterStatus$SpeciesScaleFactors$Value), 0)
-  checkEquals(parameterStatus$SpeciesScaleFactors$Index, 0)
+  checkEquals(length(parameterStatus$SpeciesScaleFactors$Index), 0)
   
   time <- getSimulationTime(DCI_Info=dci_info)
   checkEquals(parameterStatus$SimulationTime$Time, time$Time)
@@ -56,15 +55,15 @@ test.NoneVariablesVariable <- function() {
   checkEquals(names(parameterStatus$SimulationTime), c("Time", "Pattern"))
   
   checkEquals(length(parameterStatus$Parameters$Value), 0)
-  checkEquals(parameterStatus$Parameters$Index, 0)
+  checkEquals(length(parameterStatus$Parameters$Index), 0)
   checkEquals(length(parameterStatus$TableParameters$ID), 0)
   checkEquals(length(parameterStatus$TableParameters$Time), 0)
   checkEquals(length(parameterStatus$TableParameters$Value), 0)
   checkEquals(length(parameterStatus$TableParameters$RestartSolver), 0)
   checkEquals(length(parameterStatus$SpeciesInitialValues$Value), 0)
-  checkEquals(parameterStatus$SpeciesInitialValues$Index, 0)
+  checkEquals(length(parameterStatus$SpeciesInitialValues$Index), 0)
   checkEquals(length(parameterStatus$SpeciesScaleFactors$Value), 0)
-  checkEquals(parameterStatus$SpeciesScaleFactors$Index, 0)
+  checkEquals(length(parameterStatus$SpeciesScaleFactors$Index), 0)
   
   time <- getSimulationTime(DCI_Info=dci_info)
   checkEquals(parameterStatus$SimulationTime$Time, time$Time)
@@ -85,15 +84,15 @@ test.NoneVariablesReference <- function() {
   checkEquals(names(parameterStatus$SimulationTime), c("Time", "Pattern"))
   
   checkEquals(length(parameterStatus$Parameters$Value), 0)
-  checkEquals(parameterStatus$Parameters$Index, 0)
+  checkEquals(length(parameterStatus$Parameters$Index), 0)
   checkEquals(length(parameterStatus$TableParameters$ID), 0)
   checkEquals(length(parameterStatus$TableParameters$Time), 0)
   checkEquals(length(parameterStatus$TableParameters$Value), 0)
   checkEquals(length(parameterStatus$TableParameters$RestartSolver), 0)
   checkEquals(length(parameterStatus$SpeciesInitialValues$Value), 0)
-  checkEquals(parameterStatus$SpeciesInitialValues$Index, 0)
+  checkEquals(length(parameterStatus$SpeciesInitialValues$Index), 0)
   checkEquals(length(parameterStatus$SpeciesScaleFactors$Value), 0)
-  checkEquals(parameterStatus$SpeciesScaleFactors$Index, 0)
+  checkEquals(length(parameterStatus$SpeciesScaleFactors$Index), 0)
   
   time <- getSimulationTime(DCI_Info=dci_info)
   checkEquals(parameterStatus$SimulationTime$Time, time$Time)

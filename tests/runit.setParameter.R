@@ -1,6 +1,7 @@
-require(RUnit, quietly=TRUE)
-require(MoBiToolboxForR, quietly=TRUE)
-simModelXML <- "./models/black american girl.xml"
+#require(RUnit, quietly=TRUE)
+#require(MoBiToolboxForR, quietly=TRUE)
+simModelXML <- "./tests/models/black american girl.xml"
+simModelTableXML = "./tests/models/TableParameters.xml"
 standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
 
 test.EmptyPathID <- function() {
@@ -91,18 +92,24 @@ test.CheckProperties <- function() {
 test.CheckParameterInSimulationNoneVariables <- function() {
   dci_info <- standard_dci_info
   options <- list(Type="variable")
+  path_id_test = 113;
+  parameter = getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(length(parameter$Index), 0);
   
-  checkException(getParameter(path_id=113, DCI_Info = dci_info, options=options))  
+  options(warn = 2);
+  checkException(getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
+
   checkException(setParameter(value=5, path_id=113, DCI_Info = dci_info, options=options))
 }
-
 
 test.SetParameterEffectOnFormular <- function(){
   
   initStruct <- initParameter(initStruct = list(), path_id = "*|my Compound|Effective molecular weight", initializeIfFormula = "withWarning")
   initStruct <- initParameter(initStruct = initStruct, path_id = "*|my Compound|Br", initializeIfFormula = "withWarning")
   
-  dci_info <- initSimulation(XML="./models/black american girl.xml", ParamList = initStruct)
+  dci_info <- initSimulation(XML = simModelXML, ParamList = initStruct)
   v = getParameter("*|Effective molecular weight", DCI_Info = dci_info)$Value
   dci_info = setParameter(value = 10, "*|Br", DCI_Info = dci_info)
   
@@ -111,7 +118,7 @@ test.SetParameterEffectOnFormular <- function(){
 }
 
 test.CheckRowIndexWithTableParameters <- function() {
-  dci_info <- initSimulation(XML="./models/TableParameters.xml", whichInitParam="all")
+  dci_info <- initSimulation(XML = simModelTableXML, whichInitParam="all")
   
   options <- list(Type="variable", Property = "Value")
   parameter <- getParameter(path_id=61, DCI_Info = dci_info, options=options)

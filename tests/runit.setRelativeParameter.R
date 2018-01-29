@@ -1,6 +1,6 @@
-require(RUnit, quietly=TRUE)
-require(MoBiToolboxForR, quietly=TRUE)
-simModelXML <- "./models/black american girl.xml"
+#require(RUnit, quietly=TRUE)
+#require(MoBiToolboxForR, quietly=TRUE)
+simModelXML <- "./tests/models/black american girl.xml"
 standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
 
 test.EmptyPathID <- function() {
@@ -91,7 +91,14 @@ test.CheckProperties <- function() {
 test.CheckParameterInSimulationNoneVariables <- function() {
   dci_info <- standard_dci_info
   options <- list(Type="variable")
+  path_id_test = 113;
+  parameter = getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(length(parameter$Index), 0);
   
-  checkException(getParameter(path_id=113, DCI_Info = dci_info, options=options))
+  options(warn = 2);
+  checkException(getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
+
   checkException(setRelativeParameter(value=5, path_id=113, DCI_Info = dci_info, options=options))
 }

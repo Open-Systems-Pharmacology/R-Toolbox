@@ -18,7 +18,7 @@ Current initialization structure with previously initialized parameters and/or s
 The path_id can be a string (Path) or a number (ID). 
 }
   \item{initializeIfFormula}{
-Should the parameter be initialized if it contains a formula? ("never", "allways", "withWarning"), Default is "withWarning".
+Should the parameter be initialized if it contains a formula? ("never", "always", "withWarning"), Default is "withWarning".
 }
 }
 \details{
