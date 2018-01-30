@@ -10,7 +10,7 @@ MobiSettings <- function(libraryName = "MoBiToolboxForR")
       Sys.setenv(path = paste(libpath, Sys.getenv("path"), sep =";"))
       MobiSettings <- list("SimModelSchema" = paste(libpath,"\\OSPSuite.SimModel.xsd", sep=""),
                            "SimModelComp" = paste(libpath, "\\OSPSuite_SimModelComp.xml", sep=""),
-                           "RInterface" = paste(libpath,"\\DCIR6_0.dll", sep=""));
+                           "RInterface" = paste(libpath,"\\DCIR6_1.dll", sep=""));
     }
   }
 

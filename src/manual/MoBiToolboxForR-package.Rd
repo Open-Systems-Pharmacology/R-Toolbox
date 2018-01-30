@@ -12,8 +12,8 @@ This package provides functions to access a MoBi® model from R.
 \tabular{ll}{
 Package: \tab MoBiToolboxForR\cr
 Type: \tab Package\cr
-Version: \tab 6.3.1\cr
-Date: \tab 2016-07-20\cr
+Version: \tab 7.3.0\cr
+Date: \tab 2018-30-01\cr
 License: \tab GPL2 \cr
 }
 
@@ -43,9 +43,9 @@ The most important functions are:
 \code{\link{getSimulationResult}} 
 }
 \author{
-Linus Goerlitz, Bernd Ludewig
+Open Systems Pharmacology Community
 
-Open Systems Pharmacology Suite Community, https://github.com/Open-Systems-Pharmacology/Suite
+Open Systems Pharmacology Community, http://www.open-systems-pharmacology.org/
 
 }
 \references{
