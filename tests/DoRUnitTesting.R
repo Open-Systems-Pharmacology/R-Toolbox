@@ -50,7 +50,7 @@ main = function() {
     nrOfErrors = errors$nErr + errors$nFail;
 
     # Print test protocol into the command line.
-    printTextProtocol(testResults)
+    #printTextProtocol(testResults)
 
     #Print test protocol into a html.
     printHTMLProtocol(testResults, fileName=htmlFileName)
@@ -62,9 +62,12 @@ main = function() {
 
     #Not sure what this line is for.
     #checkUsagePackage("MoBiToolboxForR")
-    
-    print(nrOfErrors)
-    return(nrOfErrors)
+
+    errorCode = 0;
+    if (nrOfErrors > 0){
+      errorCode = 10;
+    }
+    quit(status = errorCode)
 }
 
-main();
+main()
