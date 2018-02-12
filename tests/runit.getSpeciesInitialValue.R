@@ -1,6 +1,6 @@
-require(RUnit, quietly=TRUE)
-require(MoBiToolboxForR, quietly=TRUE)
-simModelXML <- "./models/black american girl.xml"
+#require(RUnit, quietly=TRUE)
+#require(MoBiToolboxForR, quietly=TRUE)
+simModelXML <- "./tests/models/black american girl.xml"
 standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
 
 test.EmptyPathID <- function() {
@@ -44,8 +44,15 @@ test.CheckParameterInSimulation <- function() {
   checkEquals(dci_info$ReferenceTab$VariableSpecies$InitialValue[parameter$Index], parameter$Value)
   
   options <- list(Type="variable")
-  checkException(getSpeciesInitialValue(path_id=141, DCI_Info = dci_info, options=options))
+  path_id_test = 141;
+  parameter = getSpeciesInitialValue(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(length(parameter$Index), 0);
   
+  options(warn = 2);
+  checkException(getSpeciesInitialValue(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
+
   options <- list(Type="current")
   parameter <- getSpeciesInitialValue(path_id=141, DCI_Info = dci_info, options=options)
   checkEquals(names(parameter), c("Value","Index"))
@@ -125,7 +132,14 @@ test.CheckParameterInSimulationNoneVariables <- function() {
   checkEquals(dci_info$InputTab$AllSpecies$InitialValue[parameter$Index], parameter$Value)
 
   options <- list(Type="variable")
-  checkException(getSpeciesInitialValue(path_id=134, DCI_Info = dci_info, options=options))
+  path_id_test = 134;
+  parameter = getSpeciesInitialValue(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(length(parameter$Index), 0);
+  
+  options(warn = 2);
+  checkException(getSpeciesInitialValue(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
 }
 
 test.CheckPropertiesReadOnlyWithVariableDefined <- function() {

@@ -67,7 +67,8 @@ getParameter <- function(path_id = "*", options = {}, DCI_Info = {})
 	
 	if (length(indx) == 0)
 	{
-		stop(paste("Parameter with path_id", path_id, "does not exist for specified parameter type", options$Type))
+	  warning(paste("Parameter with path_id", path_id, "does not exist for specified parameter type", options$Type))
+	  return(list(Value = NULL, Index = NULL));
 	}
   
 	if (toupper(options$Type) != "REFERENCE")
@@ -116,6 +117,21 @@ getParameter <- function(path_id = "*", options = {}, DCI_Info = {})
         id <- Table$ID[i]
         x <- ParameterTable$Time[which(ParameterTable$ID == id)]
         y <- ParameterTable$Value[which(ParameterTable$ID == id)]
+        
+        # for parameter type current search also readonly options if not found in variable options
+        if ((length(x) == 0) & (toupper(options$Type) == "CURRENT"))
+        {
+          iParameterTable = which(names(DCI_Info$InputTab) == "AllTableParameters");
+          if (toupper(options$Type) != "REFERENCE")
+          {
+            ParameterTable <- DCI_Info$InputTab[[iParameterTable]]
+          } else {
+            ParameterTable <- DCI_Info$ReferenceTab[[iParameterTable]]	
+          }
+          x <- ParameterTable$Time[which(ParameterTable$ID == id)]
+          y <- ParameterTable$Value[which(ParameterTable$ID == id)]
+        }
+        
         newy <- approx(x=x, y=y, xout=options$TimeProfile, method="linear", rule=2)$y
         if (length(options$TimeProfile) > 1) 
         {

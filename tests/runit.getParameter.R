@@ -1,9 +1,18 @@
-require(RUnit, quietly=TRUE)
-require(MoBiToolboxForR, quietly=TRUE)
-simModelXML <- "./models/black american girl.xml"
-tableParamXML <- "./models/TableParameters.xml"
+#require(RUnit, quietly=TRUE)
+#require(MoBiToolboxForR, quietly=TRUE)
+simModelXML <- "./tests/models/black american girl.xml"
+tableParamXML <- "./tests/models/TableParameters.xml"
 standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
 tableParam_dci_info <- initSimulation(XML=tableParamXML, whichInitParam="all", SimulationNumber=2)
+
+# Path of a parameter provided by its path name.
+path_id_byName = "black american girl|Organism|Muscle|Plasma|my Compound|concentration";
+# Path of a parameter provided by its path name containing brackets.
+path_id_byName_brackets = "black american girl|Organism|pH (plasma)";
+# A non-existent id.
+path_id_nonExistent = 0;
+# A non-existent path.
+path_id_byName_nonExistent = "black american girl|Organism|nonExistent";
 
 test.EmptyPathID <- function() {
   dci_info <- standard_dci_info
@@ -46,7 +55,15 @@ test.CheckParameterInSimulation <- function() {
   checkEquals(dci_info$ReferenceTab$VariableParameters$Value[parameter$Index], parameter$Value)
   
   options <- list(Type="variable")
-  checkException(getParameter(path_id=114, DCI_Info = dci_info, options=options))
+  # If the parameter is not found, the function should return an empty list and a warning. Check first for returning an empty list, check then for returning a warning.
+  path_id_test = 114;
+  parameter = getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(length(parameter$Index), 0);
+  
+  options(warn = 2);
+  checkException(getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
   
   options <- list(Type="current")
   parameter <- getParameter(path_id=114, DCI_Info = dci_info, options=options)
@@ -302,27 +319,55 @@ test.CheckParameterInSimulationNoneVariables <- function() {
   checkEquals(names(parameter), c("Value","Index"))
   checkEquals(dci_info$InputTab$AllParameters$Value[parameter$Index], parameter$Value)
   
-  # Check that an exception is thrown when the parameter does not exist in the simulation
-  checkException(getParameter(path_id=0, DCI_Info = dci_info, options=options))
-
+  # If the parameter is not found, the function should return an empty list and a warning. Check first for returning an empty list, check then for returning a warning.
+  path_id_test = path_id_byName_nonExistent;
+  parameter = getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(length(parameter$Index), 0);
+  
+  options(warn = 2);
+  checkException(getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
+  
   options <- list(Type="variable")
-  checkException(getParameter(path_id=113, DCI_Info = dci_info, options=options))
+  path_id_test = 113;
+  parameter = getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(length(parameter$Index), 0);
+  
+  options(warn = 2);
+  checkException(getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
 }
 
 # Check if a parameter can be found by its given path name when no parameters were initialized explicitely.
 test.CheckParameterInSimulationNoneVariables_byPath <- function() {
   dci_info <- standard_dci_info
   options <- list(Type="current")
-  parameter <- getParameter(path_id = "black american girl|Organism|Muscle|Plasma|my Compound|concentration", DCI_Info = dci_info, options=options)
+  parameter <- getParameter(path_id = path_id_byName, DCI_Info = dci_info, options=options)
   
   checkEquals(names(parameter), c("Value","Index"))
   checkEquals(dci_info$InputTab$AllParameters$Value[parameter$Index], parameter$Value)
   
-  # Check that an exception is thrown when the parameter does not exist in the simulation
-  checkException(getParameter(path_id = "black american girl|Organism|nonExistent", DCI_Info = dci_info, options=options))
+  # If the parameter is not found, the function should return an empty list and a warning. Check first for returning an empty list, check then for returning a warning.
+  path_id_test = path_id_byName_nonExistent;
+  parameter = getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(length(parameter$Index), 0);
+  
+  options(warn = 2);
+  checkException(getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
   
   options <- list(Type="variable")
-  checkException(getParameter(path_id = "black american girl|Organism|Muscle|Plasma|my Compound|concentration", DCI_Info = dci_info, options=options))
+  path_id_test = path_id_byName;
+  parameter = getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("Value","Index"))
+  checkEquals(length(parameter$Index), 0);
+  
+  options(warn = 2);
+  checkException(getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
 }
 
 # Check if a parameter can be found by its given path name when no parameters were initialized explicitely
@@ -330,7 +375,7 @@ test.CheckParameterInSimulationNoneVariables_byPath <- function() {
 test.CheckParameterInSimulationNoneVariables_byPathBrackets <- function() {
   dci_info <- standard_dci_info
   options <- list(Type="current")
-  parameter <- getParameter(path_id = "black american girl|Organism|pH (plasma)", DCI_Info = dci_info, options=options)
+  parameter <- getParameter(path_id = path_id_byName_brackets, DCI_Info = dci_info, options=options)
   
   checkEquals(names(parameter), c("Value","Index"))
   checkEquals(dci_info$InputTab$AllParameters$Value[parameter$Index], parameter$Value)
