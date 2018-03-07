@@ -1,5 +1,5 @@
 # Perform unit tests for the R Toolbox.
-# Usage from CMD: Rpackage DoRUnitTesting.R "Path/To/The/ToolboxFolder"
+# Usage from CMD: RScript DoRUnitTesting.R "Path/To/The/ToolboxFolder/"
 
 library(RUnit)
 #library(codetools)
@@ -11,6 +11,12 @@ main = function() {
 
     # Default path to the toolbox. Selected if no path provided via CLI.
     toolboxDir = "";
+    if (length(args) > 0) {
+      toolboxDir = args[1];
+      if (length(args) > 1) {
+        warning("The function only supports one command line parameter, which is the path to the toolbox location. In case of multiple parameters, only the first one is used as a path, the others are ignored.")
+      }
+    }
     # Path to the directory where test files are located.
     testFolderDir = paste0(toolboxDir, "tests");
     # Path to the directory where toolbox source files are located.
@@ -18,14 +24,7 @@ main = function() {
     #Path to the *.html file for writing test results.
     htmlFileName = paste0(testFolderDir, "/Protocol.html");
     testSuiteName = "MoBiToolBoxForRTests";
-
-    if (length(args) > 0) {
-        toolboxDir = args[1];
-        if (length(args) > 1) {
-            warning("The function only supports one command line parameter, which is the path to the toolbox location. In case of multiple parameters, only the first one is used as a path, the others are ignored.")
-        }
-    }
-
+	
     setwd(toolboxDir)
     options <- getOption("RUnit")
     options$silent <- TRUE
