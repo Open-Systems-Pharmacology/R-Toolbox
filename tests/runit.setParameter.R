@@ -93,10 +93,7 @@ test.CheckParameterInSimulationNoneVariables <- function() {
   dci_info <- standard_dci_info
   options <- list(Type="variable")
   path_id_test = 113;
-  parameter = getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
-  checkEquals(names(parameter), c("Value","Index"))
-  checkEquals(length(parameter$Index), 0);
-  
+  #The parameter with the given ID is not variable - an error must be thrown
   options(warn = 2);
   checkException(getParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
   options(warn = 0);

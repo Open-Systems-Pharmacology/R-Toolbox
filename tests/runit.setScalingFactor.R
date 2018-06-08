@@ -33,9 +33,7 @@ test.CheckRunSimulationWithStandardAbsTol <- function() {
   }
   
   #Simulation should fail. If it does not, scale factors were not set!
-  options(warn = 2);
   checkException(processSimulation(DCI_Info_opt));
-  options(warn = 0);
 }
 
 #Change all scale factors of ScaleFactors_opt to 1 and run the simulation with reduced AbsTol. The simulation should run and
