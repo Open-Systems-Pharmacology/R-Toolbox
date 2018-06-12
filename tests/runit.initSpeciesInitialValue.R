@@ -1,6 +1,6 @@
-require(RUnit, quietly=TRUE)
-require(MoBiToolboxForR, quietly=TRUE)
-simModelXML <- "./models/black american girl.xml"
+#require(RUnit, quietly=TRUE)
+#require(MoBiToolboxForR, quietly=TRUE)
+simModelXML <- "./tests/models/black american girl.xml"
 
 test.EmptyPathID <- function() {
   paramList <- {}

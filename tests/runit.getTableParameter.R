@@ -1,6 +1,6 @@
-require(RUnit, quietly=TRUE)
-require(MoBiToolboxForR, quietly=TRUE)
-simModelXML <- "./models/TableParameters.xml"
+#require(RUnit, quietly=TRUE)
+#require(MoBiToolboxForR, quietly=TRUE)
+simModelXML <- "./tests/models/TableParameters.xml"
 standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="all")
 
 test.EmptyPathID <- function() {
@@ -58,8 +58,15 @@ test.CheckParameterInSimulation <- function() {
   checkEquals(dci_info$ReferenceTab$VariableTableParameters$RestartSolver[idx], parameter$RestartSolver[idx2])
   
   options <- list(Type="variable")
-  checkException(getTableParameter(path_id=5822, DCI_Info = dci_info, options=options))
+  path_id_test = 5822;
+  parameter = getTableParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("ID", "Time", "Value", "RestartSolver"));
+  checkEquals(length(parameter$ID), 0);
   
+  options(warn = 2);
+  checkException(getTableParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
+
   options <- list(Type="current")
   parameter <- getTableParameter(path_id=5822, DCI_Info = dci_info, options=options)
   checkEquals(names(parameter), c("ID", "Time", "Value", "RestartSolver"))
@@ -247,7 +254,14 @@ test.CheckParameterInSimulationNoneVariables <- function() {
   checkEquals(dci_info$InputTab$AllTableParameters$Time[idx], parameter$Time[idx2])
   checkEquals(dci_info$InputTab$AllTableParameters$Value[idx], parameter$Value[idx2])
   checkEquals(dci_info$InputTab$AllTableParameters$RestartSolver[idx], parameter$RestartSolver[idx2])
-  
+
   options <- list(Type="variable")
-  checkException(getTableParameter(path_id=5738, DCI_Info = dci_info, options=options))
+  path_id_test = 5738;
+  parameter = getTableParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("ID", "Time", "Value", "RestartSolver"));
+  checkEquals(length(parameter$ID), 0);
+  
+  options(warn = 2);
+  checkException(getTableParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
 }

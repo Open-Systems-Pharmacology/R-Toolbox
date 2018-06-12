@@ -67,7 +67,7 @@ CheckXML <- function(XML)
 	return(0)
 }
 
-initSimulation <- function(XML = "", ParamList = numeric(0), whichInitParam = "", further_options = "", Version = "6_0", SimulationNumber = 1)
+initSimulation <- function(XML = "", ParamList = numeric(0), whichInitParam = "", further_options = "", Version = "6_1", SimulationNumber = 1)
 {
 	DCI_Info <- list()
 	if (XML == "")
@@ -84,9 +84,9 @@ initSimulation <- function(XML = "", ParamList = numeric(0), whichInitParam = ""
 		stop ("No parameters can be initialized. Please provide either 'ParamList' or 'whichInitParam' with one the following valid keywords: all, none, allNonFormula.")
 	}
 	
-	# load DCIR6_0-DLL
+	# load DCIR6_1-DLL
 
-	if (length(grep("DCIR6_0", names(getLoadedDLLs()), fixed =TRUE)) ==0)
+	if (length(grep("DCIR6_1", names(getLoadedDLLs()), fixed =TRUE)) ==0)
 	{
 		dyn.load(DCI_Info$MOBI_SETTINGS$RInterface)
 	}

@@ -1,7 +1,7 @@
-require(RUnit, quietly=TRUE)
-require(MoBiToolboxForR, quietly=TRUE)
-simModelXML <- "./models/black american girl.xml"
-tableParamXML <- "./models/TableParameters.xml"
+#require(RUnit, quietly=TRUE)
+#require(MoBiToolboxForR, quietly=TRUE)
+simModelXML <- "./tests/models/black american girl.xml"
+tableParamXML <- "./tests/models/TableParameters.xml"
 standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
 tableParam_dci_info <- initSimulation(XML=tableParamXML, whichInitParam="all", SimulationNumber=2)
 

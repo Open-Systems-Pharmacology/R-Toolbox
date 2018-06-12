@@ -95,6 +95,10 @@ def add_component_files_to_archive
     copy_files 'OSPSuite.SimModelComp', 'xml'
   end
 
+  copy_depdencies lib_dir, decompressed_lib_dir do
+    copy_schema_xsd
+  end
+
   command_line = %W[a #{zip_archive} #{decompressed_dir}]
   zip command_line
 end
@@ -124,8 +128,8 @@ def copy_setup_files
   end
 
   copy_depdencies lib_dir, toolbox_src_dir do
-    copy_dci_dll
-    copy_dcir_dll
+    copy_files File.join('DCI','x86'), 'dll'
+    copy_files File.join('DCIR','x86'), 'dll'
   end
 
   copy_depdencies src_dir, toolbox_R_dir do

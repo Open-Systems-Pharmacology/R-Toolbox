@@ -1,6 +1,6 @@
-require(RUnit, quietly=TRUE)
-require(MoBiToolboxForR, quietly=TRUE)
-simModelXML <- "./models/TableParameters.xml"
+#require(RUnit, quietly=TRUE)
+#require(MoBiToolboxForR, quietly=TRUE)
+simModelXML <- "./tests/models/TableParameters.xml"
 standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="all")
 
 test.EmptyPathID <- function() {
@@ -129,6 +129,14 @@ test.CheckParameterInSimulationNoneVariables <- function() {
   values <- getTableParameter(path_id=5738, DCI_Info = dci_info, options=options)
   
   options <- list(Type="variable")
-  checkException(getTableParameter(path_id=5738, DCI_Info = dci_info, options=options))  
+  path_id_test = 5738;
+  parameter = getTableParameter(path_id = path_id_test, DCI_Info = dci_info, options=options);
+  checkEquals(names(parameter), c("ID", "Time", "Value", "RestartSolver"));
+  checkEquals(length(parameter$ID), 0);
+  
+  options(warn = 2);
+  checkException(getTableParameter(path_id = path_id_test, DCI_Info = dci_info, options=options))
+  options(warn = 0);
+
   checkException(setTableParameter(table=values, DCI_Info = dci_info, options=options))
 }
