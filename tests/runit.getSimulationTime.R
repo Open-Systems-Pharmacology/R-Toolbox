@@ -37,7 +37,9 @@ test.DistributionNotEquidistant <- function() {
   unit <- dci_info$InputTab$TimeSchema$Unit
   dci_info$InputTab$TimeSchema$Distribution <- "dummy"
   dciTimepoints <- getSimulationTime(DCI_Info=dci_info)
-  checkTrue(length(warnings()) != 0)
+  options(warn = 2);
+  checkException(getSimulationTime(DCI_Info=dci_info))
+  options(warn = 0);
   checkEquals(dciTimepoints$Time, NULL)
   checkEquals(dciTimepoints$Pattern$NoOfTimePoints, dci_info$InputTab$TimeSchema$NoOfTimePoints)
   checkEquals(dciTimepoints$Pattern$StartTime, dci_info$InputTab$TimeSchema$StartTime)
