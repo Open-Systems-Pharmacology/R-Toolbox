@@ -1,16 +1,18 @@
-
 setSimulationTime <- function(timepoints={}, DCI_Info = {})
 {
+  #Check for emtpy time interval.
 	if (length(timepoints) ==0)
 	{
 		stop("Input 'timepoints' is missing.")
 	}
+  #Check for empty DCI_Info
 	if (length(DCI_Info) ==0)
 	{
 		stop("Input 'DCI_Info' is missing.")
 	}
 	iTab <-which(names(DCI_Info$InputTab) == "TimeSchema")
 	baseunit <- DCI_Info$InputTab[[iTab]]$Unit[1]
+	#Erase old time schema
   for (j in 1:length(DCI_Info$InputTab[[iTab]]))
 	{
     attr <- attributes(DCI_Info$InputTab[[iTab]][[j]])
@@ -18,10 +20,9 @@ setSimulationTime <- function(timepoints={}, DCI_Info = {})
     attributes(DCI_Info$InputTab[[iTab]][[j]]) <- attr
 	}
 	timepoints <- sort(timepoints, decreasing = FALSE)
+	timepoints <- unique(timepoints)
 	
-
   #split time points into equidistant vectors
-  timepoints <- unique(timepoints)
   while (length(timepoints) > 1) {
     deltaT <- round(diff(timepoints),12)
 
