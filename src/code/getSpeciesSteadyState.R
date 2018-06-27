@@ -48,8 +48,11 @@ getSpeciesSteadyState = function(speciesNames = c("*"), steadyStateTime = 1000, 
   #Iterate through all species.
   for (ID in allIDs){
     isFormula = getSpeciesInitialValue(path_id = ID, list(Type = "readonly", Property = "IsFormula"), DCI_Info=DCI_Info)$Value;
+    unit = getSpeciesInitialValue(path_id = ID, list(Type = "readonly", Property = "Unit"), DCI_Info=DCI_Info)$Value;
+    
     #Add the species to the output list if it initial value is not defined by a formula OR formula defined species should not be ignored
-    if (!isFormula | !ignoreIfFormula){
+    #AND the unit is µmol. Only import of the dimension "Amount" is supported by MoBi.
+    if ((unit == "µmol") && (!isFormula || !ignoreIfFormula)){
       #Split the path of the name into container path and species name.
       fullPathParts = strsplit(existsSpeciesInitialValue(path_id = ID, options = list(Type = "readOnly"), DCI_Info = DCI_Info)$Path, "|", fixed = TRUE);
       containerPath_curr = fullPathParts[[1]][2];
@@ -62,7 +65,7 @@ getSpeciesSteadyState = function(speciesNames = c("*"), steadyStateTime = 1000, 
       moleculeName = c(moleculeName, moleculeName_curr);
       isPresent = c(isPresent, TRUE);
       value = c(value, getEndSimulationResult(path_id = ID, DCI_Info = DCI_Info)$Value);
-      units = c(units, getSpeciesInitialValue(path_id = ID, list(Type = "readonly", Property = "Unit"), DCI_Info=DCI_Info)$Value);
+      units = c(units, unit);
       scaleDivisor = c(scaleDivisor, getSpeciesInitialValue(path_id = ID, list(Type = "readonly", Property = "ScaleFactor"), DCI_Info=DCI_Info)$Value);
       negVals = c(negVals, "");
     }
