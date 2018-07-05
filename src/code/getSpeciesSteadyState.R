@@ -56,7 +56,7 @@ getSpeciesSteadyState = function(speciesNames = c("*"), steadyStateTime = 1000, 
       #Split the path of the name into container path and species name.
       fullPathParts = strsplit(existsSpeciesInitialValue(path_id = ID, options = list(Type = "readOnly"), DCI_Info = DCI_Info)$Path, "|", fixed = TRUE);
       containerPath_curr = fullPathParts[[1]][2];
-      for (i in 3 : length(fullPathParts[[1]]) - 1){
+      for (i in 3 : (length(fullPathParts[[1]]) - 1)){
         containerPath_curr = paste(containerPath_curr, fullPathParts[[1]][i], sep = "|");
       }
       moleculeName_curr = fullPathParts[[1]][length(fullPathParts[[1]])];
