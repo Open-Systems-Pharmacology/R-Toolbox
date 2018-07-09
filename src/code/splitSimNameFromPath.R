@@ -1,5 +1,5 @@
 #' Extract simulation name from the given path or a list of paths of parameter/species/observer and return
-#' a list containing the name of the simulation and the path(s) without the simulatino name.
+#' a list containing the name of the simulation and the path(s) without the simulation name.
 #' Basically, the part of the path string before the first path separator ("|") is treated like the name of the simulation.
 #' If a path is empty, an error is thrown.
 #' If a path does not consist of sub-parts separated by '|', an error is thrown.
@@ -25,7 +25,7 @@ splitSimNameFromPath = function(path = ""){
   objectPaths = vector(mode = "character", length = nrOfPaths);
   
   #Iterate through all entries and separate the first part of the string from the rest.
-  for(i in (1 : length(path))){
+  for(i in (1 : nrOfPaths)){
     currPath = path[i];
     #Check for empty path (only if one path is provided)
     if (nchar(currPath) == 0){
@@ -33,7 +33,7 @@ splitSimNameFromPath = function(path = ""){
     }
     
     path_parts = strsplit(path[i], "|", fixed = TRUE);
-    #If the number of path parts is less then two, no distictino  between simulation name and path can be performed
+    #If the number of path parts is less then two, no distiction between simulation name and path can be performed
     if (length(path_parts[[1]]) <= 1){
       stop(paste0("The path ", currPath, " has no sub-parts separated by '|', cannot extract simulation name!"));
     }
