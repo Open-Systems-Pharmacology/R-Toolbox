@@ -9,7 +9,7 @@ MANUFACTURER = 'Open Systems Pharmacology'
 PRODUCT_ID = Utils.uuid.to_s
 
 task :create_setup, [:product_version] do |t, args|
-  @product_version = args.product_version
+  @product_version = sanitized_version(args.product_version)
   release_version_split= @product_version.split('.')
   @product_release_version = "#{release_version_split[0]}.#{release_version_split[1]}"
   @product_full_version = "#{@product_release_version}.#{release_version_split[2]}"
@@ -78,6 +78,12 @@ task :execute_light => :execute_candle do
 end
 
 private
+
+def sanitized_version(version) 
+  pull_request_index = version.index('-')
+  return version unless pull_request_index
+  version.slice(0, pull_request_index)
+end
 
 def add_component_files_to_archive
   zip_archive = File.join(solution_dir, "#{@package_full_name}.zip")
