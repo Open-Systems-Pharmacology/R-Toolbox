@@ -20,13 +20,14 @@ task :create_setup, [:product_version] do |t, args|
 end
 
 task :create_r_package => [:prepare, :update_package_variables] do
+
   command_line = %W[CMD build --resave-data --compact-vignettes --md5 #{toolbox_dir}]
   Utils.run_cmd 'R', command_line
 
-  command_line = %W[CMD INSTALL --build --clean --resave-data --compact-docs --no-multiarch "#{@package_full_name}.tar.gz"]
+  command_line = %W[CMD INSTALL --build --clean --resave-data --compact-docs --no-multiarch #{@package_full_name}.tar.gz]
   Utils.run_cmd 'R', command_line 
 
- add_component_files_to_archive
+  add_component_files_to_archive
 end
 
 task :update_package_variables do
@@ -94,7 +95,7 @@ def add_component_files_to_archive
 
   packages_dir =  File.join(solution_dir, 'packages')
   decompressed_dir = File.join(solution_dir, PACKAGE_NAME)
-  decompressed_lib_dir = File.join(decompressed_dir, 'libs', 'i386')
+  decompressed_lib_dir = File.join(decompressed_dir, 'libs', 'x64')
 
   copy_depdencies packages_dir, decompressed_lib_dir do
     copy_files 'OSPSuite.SimModel', 'xsd'
@@ -115,7 +116,7 @@ end
 
 def copy_setup_files
   packages_dir =  File.join(solution_dir, 'packages')
-
+  arch = 'x64'
   copy_depdencies setup_dir, deploy_dir do
     copy_files '**', ['wxs', 'msm', 'rtf', 'bmp']
   end
@@ -125,7 +126,7 @@ def copy_setup_files
     copy_file 'NAMESPACE'
   end
 
-  architecture = '/**/x86/**/Release'
+  architecture = "/**/#{arch}/**/Release"
   copy_depdencies packages_dir, toolbox_src_dir do
     copy_files "OSPSuite.SimModelComp#{architecture}", 'dll'
     copy_files "OSPSuite.SimModel#{architecture}", 'dll'
@@ -134,8 +135,8 @@ def copy_setup_files
   end
 
   copy_depdencies lib_dir, toolbox_src_dir do
-    copy_files File.join('DCI','x86'), 'dll'
-    copy_files File.join('DCIR','x86'), 'dll'
+    copy_files File.join('DCI', arch), 'dll'
+    copy_files File.join('DCIR',arch), 'dll'
   end
 
   copy_depdencies src_dir, toolbox_R_dir do
