@@ -21,99 +21,60 @@ test.PropertyUnknown <- function() {
 test.CheckObserverInSimulation <- function() {
   dci_info <- standard_dci_info
   
-  options <- list(Type="readonly")
-  parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
+  parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info)
   checkEquals(names(parameter), c("Value","Index"))
   checkEquals(dci_info$InputTab$AllObservers$Formula[parameter$Index], parameter$Value)
-  
-  options <- list(Type="current")
-  parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
-  checkEquals(names(parameter), c("Value","Index"))
-  checkEquals(dci_info$InputTab$AllObservers$Formula[parameter$Index], parameter$Value)
-  
-  options <- list(Type="variable")
-  checkException(getObserverFormula(path_id=97, DCI_Info = dci_info, options=options))
-  
-  options <- list(Type="reference")
+
+
+  options <- list(isReference = TRUE)
   parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
   checkEquals(names(parameter), c("Value","Index"))
   checkEquals(dci_info$ReferenceTab$AllObservers$Formula[parameter$Index], parameter$Value)
-  
-  options <- list(Type="variable")
-  checkException(getObserverFormula(path_id=109, DCI_Info = dci_info, options=options))
-  
-  options <- list(Type="current")
-  parameter <- getObserverFormula(path_id=109, DCI_Info = dci_info, options=options)
-  checkEquals(names(parameter), c("Value","Index"))
-  checkEquals(dci_info$InputTab$AllObservers$Formula[parameter$Index], parameter$Value)
 }
 
-test.CheckPropertiesCurrent <- function() {
+test.CheckPropertiesDefault <- function() {
   dci_info <- standard_dci_info
   
-  options <- list(Type="current", Property = "ID")
+  options <- list(Property = "ID")
   parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
   checkEquals(parameter$Value, dci_info$InputTab$AllObservers$ID[parameter$Index])
   
-  options <- list(Type="current", Property = "Path")
+  options <- list(Property = "Path")
   parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
   checkEquals(parameter$Value, dci_info$InputTab$AllObservers$Path[parameter$Index])
   
-  options <- list(Type="current", Property = "Unit")
+  options <- list(Property = "Unit")
   parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
   checkEquals(parameter$Value, dci_info$InputTab$AllObservers$Unit[parameter$Index])
   
-  options <- list(Type="current", Property = "Formula")
+  options <- list(Property = "Formula")
   parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
   checkEquals(parameter$Value, dci_info$InputTab$AllObservers$Formula[parameter$Index])
   
-  options <- list(Type="current", Property = "Unknown")
-  checkException(getObserverFormula(path_id=97, DCI_Info = dci_info, options=options))
-}  
-
-test.CheckPropertiesReadonly <- function() {
-  dci_info <- standard_dci_info
-  
-  options <- list(Type="readonly", Property = "ID")
-  parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
-  checkEquals(parameter$Value, dci_info$InputTab$AllObservers$ID[parameter$Index])
-  
-  options <- list(Type="readonly", Property = "Path")
-  parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
-  checkEquals(parameter$Value, dci_info$InputTab$AllObservers$Path[parameter$Index])
-  
-  options <- list(Type="readonly", Property = "Unit")
-  parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
-  checkEquals(parameter$Value, dci_info$InputTab$AllObservers$Unit[parameter$Index])
-  
-  options <- list(Type="readonly", Property = "Formula")
-  parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
-  checkEquals(parameter$Value, dci_info$InputTab$AllObservers$Formula[parameter$Index])
-  
-  options <- list(Type="readonly", Property = "Unknown")
+  options <- list(Property = "Unknown")
   checkException(getObserverFormula(path_id=97, DCI_Info = dci_info, options=options))
 }  
 
 test.CheckPropertiesReference <- function() {
   dci_info <- standard_dci_info
   
-  options <- list(Type="reference", Property = "ID")
+  options <- list(isReference = TRUE, Property = "ID")
   parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
   checkEquals(parameter$Value, dci_info$ReferenceTab$AllObservers$ID[parameter$Index])
   
-  options <- list(Type="reference", Property = "Path")
+  options <- list(isReference = TRUE, Property = "Path")
   parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
   checkEquals(parameter$Value, dci_info$ReferenceTab$AllObservers$Path[parameter$Index])
   
-  options <- list(Type="reference", Property = "Unit")
+  options <- list(isReference = TRUE, Property = "Unit")
   parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
   checkEquals(parameter$Value, dci_info$ReferenceTab$AllObservers$Unit[parameter$Index])
   
-  options <- list(Type="reference", Property = "Formula")
+  options <- list(isReference = TRUE, Property = "Formula")
   parameter <- getObserverFormula(path_id=97, DCI_Info = dci_info, options=options)
   checkEquals(parameter$Value, dci_info$ReferenceTab$AllObservers$Formula[parameter$Index])
   
-  options <- list(Type="reference", Property = "Unknown")
+  options <- list(isReference = TRUE, Property = "Unknown")
   checkException(getObserverFormula(path_id=97, DCI_Info = dci_info, options=options))
 }  
 

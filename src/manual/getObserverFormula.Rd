@@ -20,7 +20,7 @@ If options$Index is set, the path_id is ignored.
   \item{options}{
 Following options are supported: 
 
-Type ("current", "variable", "readonly" or "reference"), Default is "current".
+isReference (TRUE or FALSE), Default is FALSE.
 
 Property ("ID", "Unit", "Formula", "Path"), Default is "Formula".
 
@@ -32,7 +32,6 @@ The DCI Info structure containing the DCI handle and all settings.
 }
 }
 \details{
-If options$Type is "current" the function searches first in the variable observers and then in the readonly ones.
 }
 \value{
 Returns a list with following information:
@@ -58,7 +57,7 @@ Open Systems Pharmacology Suite Community, https://github.com/Open-Systems-Pharm
 \examples{
 # gets Path information for observer with ID 147.
 valueInfo <- getObserverFormula(path_id = 147, 
-								options = list(Type = "readonly", Property = "Path"), 
+								options = list(Property = "Path"), 
 								DCI_Info = dci_info)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

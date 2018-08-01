@@ -3,12 +3,7 @@ getObserverFormula <- function(path_id = "*", options = {}, DCI_Info = {})
 {
 	if (length(options) == 0)
 	{
-		options <- list(Type = "current", Property = "Formula", Index = numeric(0))
-	}
-	if (length(grep("Type",names(options), fixed =TRUE)) == 0)
-	{
-		options[[length(options)+1]] <- "current"
-		names(options)[length(options)] <- "Type"
+		options <- list(Property = "Formula", Index = numeric(0), isReference = FALSE)
 	}
 	if (length(grep("Property",names(options), fixed =TRUE)) == 0)
 	{
@@ -20,6 +15,11 @@ getObserverFormula <- function(path_id = "*", options = {}, DCI_Info = {})
 		options[[length(options)+1]] <- numeric(0)
 		names(options)[length(options)] <- "Index"
 	}
+  if (length(grep("isReference",names(options), fixed =TRUE)) == 0)
+  {
+    options[[length(options)+1]] <- FALSE
+    names(options)[length(options)] <- "isReference"
+  }
 	if (length(DCI_Info) == 0)
 	{
 		stop("No DCI_Info provided.")
@@ -32,10 +32,6 @@ getObserverFormula <- function(path_id = "*", options = {}, DCI_Info = {})
 	{
 		stop("Invalid property provided. Please use one of the following: ID, Unit, Formula, Path.")
 	}
-	if (!(toupper(options$Type) %in% c("CURRENT", "READONLY", "REFERENCE"))	)
-	{
-	  stop("Invalid type provided. Please use one of the following: current, readonly, reference.")
-	}
   
 	iTab <- which(names(DCI_Info$InputTab) == "AllObservers")
 	
@@ -44,16 +40,16 @@ getObserverFormula <- function(path_id = "*", options = {}, DCI_Info = {})
 	  indx <- options$Index		
 	} else 
   {
-	  indx <- findTableIndex(path_id = path_id, tableID = iTab, isReference = (toupper(options$Type) == "REFERENCE"), DCI_Info = DCI_Info)
+	  indx <- findTableIndex(path_id = path_id, tableID = iTab, options$isReference, DCI_Info = DCI_Info)
 	}
 	
 	if (length(indx) == 0)
 	{
-	warning(paste("Observer with path_id", path_id, "does not exist for specified type", options$Type))
+	warning(paste("Observer with path_id", path_id, "does not exist!"))
 	  return(list(Value = NULL, Index = NULL));
 	}
   
-	if (toupper(options$Type) != "REFERENCE")
+	if (options$isReference == FALSE)
 	{
 	  Table <- DCI_Info$InputTab[[iTab]]
 	} else {
