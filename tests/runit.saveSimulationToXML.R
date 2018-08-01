@@ -21,9 +21,11 @@ test.OverwrittingExistingFile <- function() {
   file <- saveSimulationToXML(DCI_Info = dci_info)
   checkTrue(file.exists(file))
   checkEquals(file, path)
-  
+  options(warn = 2);
+  checkException(file <- saveSimulationToXML(DCI_Info = dci_info))
+  options(warn = 0);
   file <- saveSimulationToXML(DCI_Info = dci_info)
-  checkTrue(length(warnings())>0)
+  
   checkTrue(file.exists(file))
   checkEquals(file, path)
   file.remove(file)
@@ -32,13 +34,15 @@ test.OverwrittingExistingFile <- function() {
 test.CreateNonExistingFolder <- function() {
   dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
   path <- file.path(getwd(), "Willi", "TestSim.xml")
-  
   checkTrue(!file.exists(dirname(path)))
+  options(warn = 2);
+  checkException(file <- saveSimulationToXML(XML=path, DCI_Info = dci_info))
+  options(warn = 0);
+  
   file <- saveSimulationToXML(XML=path, DCI_Info = dci_info)
   checkTrue(file.exists(file))
   checkEquals(file, path)
-  checkTrue(length(warnings())>0)
-  
+
   file.remove(file)
   unlink(dirname(file), recursive=TRUE)
 }
@@ -60,13 +64,11 @@ test.CheckXMLAllNonFormulaVariables <- function () {
   dci_info <- initSimulation(XML=simModelXML, whichInitParam="allnonFormula")
   path <- file.path(getwd(), "TestSim.xml")
   
-  savedFile <- saveSimulationToXML(XML=path, DCI_Info = dci_info)
-  savedDCI <- initSimulation(XML=savedFile, whichInitParam="allnonFormula")
-  
-  #TODO: handle µ etc. properly
-  
-  idx <- which(names(dci_info) != "Handle")
-  checkEquals(dci_info[idx], savedDCI[idx])
+  savedFile <- saveSimulationToXML(XML=path, DCI_Info = dci_info);
+  savedDCI <- initSimulation(XML=savedFile, whichInitParam="allnonFormula");
+
+  idx <- which(names(dci_info) != "Handle");
+  checkEquals(dci_info[idx], savedDCI[idx]);
   
   file.remove(savedFile)
 }
@@ -76,10 +78,16 @@ test.CheckXMLAllVariables <- function () {
   path <- file.path(getwd(), "TestSim.xml")
   
   savedFile <- saveSimulationToXML(XML=path, DCI_Info = dci_info)
+  #Must process simulations before comparison - otherwise the formulas in the first simulation (dci_info) are not overwritten
+  dci_info = processSimulation(DCI_Info = dci_info);
+  
   savedDCI <- initSimulation(XML=savedFile, whichInitParam="all")
   
   idx <- which(names(dci_info) != "Handle")
+  
+  savedDCI = processSimulation(DCI_Info = savedDCI);
+  
   checkEquals(dci_info[idx], savedDCI[idx])
   
-  file.remove(savedFile)
+  file.remove(savedFile);
 }
