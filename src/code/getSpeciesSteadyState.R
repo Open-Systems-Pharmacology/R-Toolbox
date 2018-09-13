@@ -1,10 +1,9 @@
-
 #' Get the steady-state values of species. The steady-state is considered to be the last value of the simulation with sufficiently
-#' long simulation time, i.e., where the rates of the processes do not change.
+#' long simulation time, i.e., where the rates of the processes do not (significantly) change.
 #'
 #' @param speciesNames Vector of species names which steady-state values will be returned. By default, values of all species are returned. This also includes
 #' values of "state variable" parameters, as these are treated like species.
-#' @param steadyStateTime Simulation time (minites). Must be long enough for system to reach a steady-state. Default is 1000 minutes.
+#' @param steadyStateTime Simulation time (minites). Must be long enough for system to reach a steady-state.
 #' @param ignoreIfFormula If "TRUE", species with initial values defined by formula are not included. Default is "TRUE".
 #' @param DCI_Info The DCI Info structure containing the DCI handle and all settings.
 #'
@@ -25,15 +24,16 @@
 #'   #Initialize the given simulation with no variable parameters
 #' myDCI = initSimulation(modelPath, whichInitParam = "none");
 #' Get species steady-state
-#' initialValues = getSpeciesSteadyState(DCI_Info = myDCI, ignoreIfFormula = FALSE);
+#' initialValues = getSpeciesSteadyState(DCI_Info = myDCI, ignoreIfFormula = FALSE, steadyStateTime = 1000);
 #' Write the results into an excel file. (example with package "openxlsx"
 #' write.xlsx(list("Molecules" = (initialValues$moleculesSteadyState), "Parameters" = initialValues$parametersSteadyState), resultsXLS, colNames = TRUE)
-getSpeciesSteadyState = function(speciesNames = c("*"), steadyStateTime = 1000, ignoreIfFormula = TRUE, DCI_Info = {}){
+getSpeciesSteadyState = function(speciesNames = c("*"), steadyStateTime, ignoreIfFormula = TRUE, DCI_Info = {}){
   #Perform initial input check
   if (length(DCI_Info) == 0)
   {
     stop("No DCI_Info provided.")
   }
+  
   if (steadyStateTime <= 0){
     stop("steadyStateTime must be >0!");
   }
