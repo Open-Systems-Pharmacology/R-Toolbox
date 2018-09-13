@@ -1,9 +1,8 @@
 environment:
-  app_version: '7.4.0'
   R_INSTALL_DIR: 'C:\ProgramData\R\'
   R_TOOLS_INSTALL_DIR: 'C:\ProgramData\RTools\'
 
-version: '%app_version%.{build}'
+version: '7.4.0.{build}'
 
 branches:
   only:
