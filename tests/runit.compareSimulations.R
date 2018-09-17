@@ -1,8 +1,10 @@
 #require(RUnit, quietly=TRUE)
 #require(MoBiToolboxForR, quietly=TRUE)
-simModelXML1 <- "./tests/models/black american girl.xml"
+simModelXML1 <- "./tests/models/black american girl.xml";
+simModelXML2 = "./tests/models/default man.xml";
 dci_info1 = initSimulation(simModelXML1, whichInitParam = "none");
 dci_info2 = initSimulation(simModelXML1, whichInitParam = "none");
+dci_info3 = initSimulation(simModelXML2, whichInitParam = "none");
 resultsPath = file.path(getwd(), "CurrentComparison.csv");
 
 #Check for both DCI_Info!
@@ -51,7 +53,7 @@ test.ignoreFormulainvalid = function(){
 
 #Same DCI - results identical
 test.sameDCI = function(){
-  diffs = compareSimulations(DCI_Info1 = dci_info1, DCI_Info2 = dci_info1, resultsCSV_path = resultsPath);
+  diffs = compareSimulations(DCI_Info1 = dci_info1, DCI_Info2 = dci_info1);#, resultsCSV_path = resultsPath);
   checkEquals(diffs$SimNames[1], diffs$SimNames[2]);
   checkEquals(length(diffs$Params_diff), 0);
   checkEquals(length(diffs$Species_diff), 0);
@@ -61,7 +63,7 @@ test.sameDCI = function(){
 
 #Different DCI, same simulation, ignoreFormula = TRUE, results should be identical
 test.simulationsIdentical_ignoreFormula = function(){
-  diffs = compareSimulations(DCI_Info1 = dci_info1, DCI_Info2 = dci_info2, ignoreFormula = TRUE, resultsCSV_path = resultsPath);
+  diffs = compareSimulations(DCI_Info1 = dci_info1, DCI_Info2 = dci_info2, ignoreFormula = TRUE);#, resultsCSV_path = resultsPath);
   checkEquals(diffs$SimNames[1], diffs$SimNames[2]);
   checkEquals(length(diffs$Params_diff), 0);
   checkEquals(length(diffs$Species_diff), 0);
@@ -71,7 +73,7 @@ test.simulationsIdentical_ignoreFormula = function(){
 
 #Different DCI, same simulation, ignoreFormula = FALSE, results should be identical
 test.simulationsIdentical_notIgnoreFormula = function(){
-  diffs = compareSimulations(DCI_Info1 = dci_info1, DCI_Info2 = dci_info2, ignoreFormula = FALSE, resultsCSV_path = resultsPath);
+  diffs = compareSimulations(DCI_Info1 = dci_info1, DCI_Info2 = dci_info2, ignoreFormula = FALSE);#, resultsCSV_path = resultsPath);
   checkEquals(diffs$SimNames[1], diffs$SimNames[2]);
   checkEquals(length(diffs$Params_diff), 0);
   checkEquals(length(diffs$Species_diff), 0);
@@ -93,7 +95,7 @@ test.simulationsIdentical_InitAll_notIgnoreFormula = function(){
 #Different DCI, same simulation, but one simulation with initialized formulas, ignoreFormula = TRUE, results should be identical
 test.simulationsIdentical_InitAll_ignoreFormula = function(){
   dci_info2_diff = initSimulation(simModelXML1, whichInitParam = "all");
-  diffs = compareSimulations(DCI_Info1 = dci_info1, DCI_Info2 = dci_info2_diff, ignoreFormula = TRUE, resultsCSV_path = resultsPath);
+  diffs = compareSimulations(DCI_Info1 = dci_info1, DCI_Info2 = dci_info2_diff, ignoreFormula = TRUE);#, resultsCSV_path = resultsPath);
   checkEquals(diffs$SimNames[1], diffs$SimNames[2]);
   checkEquals(length(diffs$Params_diff), 0);
   checkEquals(length(diffs$Species_diff), 0);
@@ -112,14 +114,14 @@ test.simulationsIdentical_InitParam_sameValue = function(){
   dci_info1_diff = setParameter(80, paramPath, DCI_Info = dci_info1_diff);
   dci_info2_diff = setParameter(80, paramPath, DCI_Info = dci_info2_diff);
   
-  diffs = compareSimulations(DCI_Info1 = dci_info1_diff, DCI_Info2 = dci_info2_diff, ignoreFormula = TRUE, resultsCSV_path = resultsPath);
+  diffs = compareSimulations(DCI_Info1 = dci_info1_diff, DCI_Info2 = dci_info2_diff, ignoreFormula = TRUE);#, resultsCSV_path = resultsPath);
   checkEquals(diffs$SimNames[1], diffs$SimNames[2]);
   checkEquals(length(diffs$Params_diff), 0);
   checkEquals(length(diffs$Species_diff), 0);
   checkEquals(length(diffs$Observer_diff), 0);
   checkEquals(diffs$TimeIdentical, TRUE);
   
-  diffs = compareSimulations(DCI_Info1 = dci_info1_diff, DCI_Info2 = dci_info2_diff, ignoreFormula = FALSE, resultsCSV_path = resultsPath);
+  diffs = compareSimulations(DCI_Info1 = dci_info1_diff, DCI_Info2 = dci_info2_diff, ignoreFormula = FALSE);#, resultsCSV_path = resultsPath);
   checkEquals(diffs$SimNames[1], diffs$SimNames[2]);
   checkEquals(length(diffs$Params_diff), 0);
   checkEquals(length(diffs$Species_diff), 0);
@@ -138,14 +140,14 @@ test.simulationsIdentical_InitParam_diffValue = function(){
   dci_info1_diff = setParameter(80, paramPath, DCI_Info = dci_info1_diff);
   dci_info2_diff = setParameter(70, paramPath, DCI_Info = dci_info2_diff);
   
-  diffs = compareSimulations(DCI_Info1 = dci_info1_diff, DCI_Info2 = dci_info2_diff, ignoreFormula = TRUE, resultsCSV_path = resultsPath);
+  diffs = compareSimulations(DCI_Info1 = dci_info1_diff, DCI_Info2 = dci_info2_diff, ignoreFormula = TRUE);#, resultsCSV_path = resultsPath);
   checkEquals(diffs$SimNames[1], diffs$SimNames[2]);
   checkEquals(length(diffs$Params_diff), 9);
   checkEquals(length(diffs$Species_diff), 0);
   checkEquals(length(diffs$Observer_diff), 0);
   checkEquals(diffs$TimeIdentical, TRUE);
   
-  diffs = compareSimulations(DCI_Info1 = dci_info1_diff, DCI_Info2 = dci_info2_diff, ignoreFormula = FALSE, resultsCSV_path = resultsPath);
+  diffs = compareSimulations(DCI_Info1 = dci_info1_diff, DCI_Info2 = dci_info2_diff, ignoreFormula = FALSE);#, resultsCSV_path = resultsPath);
   checkEquals(diffs$SimNames[1], diffs$SimNames[2]);
   checkEquals(length(diffs$Params_diff), 9);
   checkEquals(length(diffs$Species_diff), 0);
@@ -154,8 +156,9 @@ test.simulationsIdentical_InitParam_diffValue = function(){
 }
 
 test.timePaternChanged = function(){
-  dci_info1 = setSimulationTime(timepoints = c(0, 10), DCI_Info = dci_info1);
-  diffs = compareSimulations(DCI_Info1 = dci_info1, DCI_Info2 = dci_info2, ignoreFormula = FALSE, resultsCSV_path = resultsPath);
+  current_dci_info1 = dci_info1;
+  current_dci_info1 = setSimulationTime(timepoints = c(0, 10), DCI_Info = current_dci_info1);
+  diffs = compareSimulations(DCI_Info1 = current_dci_info1, DCI_Info2 = dci_info2, ignoreFormula = FALSE);#, resultsCSV_path = resultsPath);
   checkEquals(diffs$SimNames[1], diffs$SimNames[2]);
   checkEquals(length(diffs$Params_diff), 0);
   checkEquals(length(diffs$Species_diff), 0);

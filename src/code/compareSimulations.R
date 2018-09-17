@@ -1,37 +1,81 @@
-#objectType can be "Parameter", "Species", or "Observer"
-compareStructures = function(objectType, DCI_Info1, DCI_Info2, simName1, simName2, numTolerance, ignoreFormula){
+getObjectProperty = function(objectType, path_id, DCI_Info, property){
+  switch(objectType,
+         Parameter = {
+           value = getParameter(path_id = path_id, options = list(Type = "current", Property = property), DCI_Info = DCI_Info)$Value;
+         },
+         Species = {
+           if (property == "Value"){
+             property = "InitialValue";
+           }
+           value = getSpeciesInitialValue(path_id = path_id, options = list(Type = "current", Property = property), DCI_Info = DCI_Info)$Value;
+         },
+         Observer = {
+           #No value is returned for observers.
+           if (property == "Value"){
+             value = NaN;
+           }
+           if (property == "IsFormula"){
+             value = TRUE;
+           }
+           if (property == "Formula"){
+             value = getObserverFormula(path_id = path_id, DCI_Info = DCI_Info)$Value;
+           }
+         },
+         stop(paste0("getObjectValue: Unknown objectType passed: ", objectType, "; accepted values are 'Parameter', 'Species', 'Observer'"))
+  );
+  return(value);
+}
+
+getObjectExistance = function(objectType, path_id, DCI_Info){
+  switch(objectType,
+         Parameter = {
+           value = existsParameter(path_id = path_id, options = list(Type = "readonly"), DCI_Info = DCI_Info);
+         },
+         Species = {
+           value = existsSpeciesInitialValue(path_id = path_id, options = list(Type = "readonly"), DCI_Info = DCI_Info);
+         },
+         Observer = {
+           value = existsObserver(path_id = path_id, DCI_Info = DCI_Info);
+         },
+         stop(paste0("getObjectExistance: Unknown objectType passed: ", objectType, "; accepted values are 'Parameter', 'Species', 'Observer'"))
+  );
+  return(value);
+}
+
+compareObjects = function(DCI_Info1, DCI_Info2, options, excludeIdx = c()){
+  if (length(options) == 0){
+    stop("compareObjects: options is not provided!");
+  }
+  
   #This list holds information about the differences between simulations objects.
   objects_diff = list();
+  #Path of the object in the simulation.
+  objects_diff$Path = c();
+  #Does the object exist in the first simulation?
+  objects_diff$isExistingFirst = c();
+  #Does the object exist in the second simulation?
+  objects_diff$isExistingSecond = c();
+  #Numerical value of the object in the first simulation.
+  objects_diff$ValueFirst = c();
+  #Numerical value of the object in the second simulation.
+  objects_diff$ValueSecond = c();
+  #Is the objects value defined by a formula in the first simulation?
+  objects_diff$IsFormulaFirst = c();
+  #Is the objects value defined by a formula in the second simulation?
+  objects_diff$IsFormulaSecond = c();
+  #Formula string defining the value of the object in the first simulation. Empty if no formula used.
+  objects_diff$FormulaFirst = c();
+  #Formula string defining the value of the object in the second simulation. Empty if no formula used.
+  objects_diff$FormulaSecond = c();
   
-  #Get existence information about all objects depending on their type.
-  if(objectType == "Parameter"){
-    allObjects1 = existsParameter(path_id = "*", options = list(Type = "readonly"), DCI_Info = DCI_Info1);
-    allObjects2 = existsParameter(path_id = "*", options = list(Type = "readonly"), DCI_Info = DCI_Info2);
-  }
-  if(objectType == "Species"){
-    allObjects1 = existsSpeciesInitialValue(path_id = "*", options = list(Type = "readonly"), DCI_Info = DCI_Info1);
-    allObjects2 = existsSpeciesInitialValue(path_id = "*", options = list(Type = "readonly"), DCI_Info = DCI_Info2);
-  }
-  if(objectType == "Observer"){
-    allObjects1 = existsObserver(path_id = "*", DCI_Info = DCI_Info1);
-    allObjects2 = existsObserver(path_id = "*", DCI_Info = DCI_Info2);
-  }
+  #Get existence information about all objects.
+  allObjects1 = getObjectExistance(objectType = options$objectType, path_id = "*", DCI_Info = DCI_Info1);
+  allObjects2 = getObjectExistance(objectType = options$objectType, path_id = "*", DCI_Info = DCI_Info2);
   
-  objectsPaths = c();
-  existanceInFirst = c();
-  existanceInSecond = c();
-  valuesFirst = c();
-  valuesSecond = c();
-  formulaFlagsFirst = c();
-  formulaFlagsSecond = c();
-  formulaStringsFirst = c();
-  formulaStringsSecond = c();
-  
-  #Mark indices in the second simulation which have been compared
+  #Mark indices of the objects that have been compared in the second simulation.
   idxComparedInSecond = c();
-  
   #Iterate through all objects from the first simulation and compare them to the objects from the second simulation.
-  for (firstIdx in allObjects1$Index){
+  for (firstIdx in setdiff(allObjects1$Index, excludeIdx)){
     #Flag determining whether the objects are identical in both simulations.
     identical = TRUE;
     #Flag determining whether the object exists in the first simulation
@@ -49,89 +93,46 @@ compareStructures = function(objectType, DCI_Info1, DCI_Info2, simName1, simName
     idFirst = allObjects1$ID[firstIdx];
     
     #Value of the object in the first simulation
-    firstValue = NaN;
-    if(objectType == "Parameter"){
-      firstValue = getParameter(path_id = idFirst, options = list(Type = "current"), DCI_Info = DCI_Info1)$Value;
-    }
-    if(objectType == "Species"){
-      firstValue = getSpeciesInitialValue(path_id = idFirst, options = list(Type = "current"), DCI_Info = DCI_Info1)$Value;
-    }
+    firstValue = getObjectProperty(objectType = options$objectType, path_id = idFirst, DCI_Info = DCI_Info1, property = "Value");
     
     #Is the object defined by a formula in the first simulation?
-    isFormulaInFirst = TRUE;
-    if(objectType == "Parameter"){
-      isFormulaInFirst = as.logical(getParameter(path_id = idFirst, options = list(Type = "current", Property = "IsFormula"), DCI_Info = DCI_Info1)$Value);
-    }
-    if(objectType == "Species"){
-      isFormulaInFirst = as.logical(getSpeciesInitialValue(path_id = idFirst, options = list(Type = "current", Property = "IsFormula"), DCI_Info = DCI_Info1)$Value);
-    }
+    isFormulaInFirst = as.logical(getObjectProperty(objectType = options$objectType, path_id = idFirst, DCI_Info = DCI_Info1, property = "IsFormula"));
+    
     #Formula string (empty if the object is non-formula)
     formulaStringFirst = "";
     if(isFormulaInFirst){
-      if(objectType == "Parameter"){
-        formulaStringFirst = getParameter(path_id = idFirst, options = list(Type = "current", Property = "Formula"), DCI_Info = DCI_Info1)$Value;
-      }
-      if(objectType == "Species"){
-        formulaStringFirst = getSpeciesInitialValue(path_id = idFirst, options = list(Type = "current", Property = "Formula"), DCI_Info = DCI_Info1)$Value;
-      }
-      if(objectType == "Observer"){
-        formulaStringFirst = getObserverFormula(path_id = idFirst, DCI_Info = DCI_Info1)$Value;
-      }
+      formulaStringFirst = getObjectProperty(objectType = options$objectType, path_id = idFirst, DCI_Info = DCI_Info1, property = "Formula");
     }
     
     #Find the entry with the same path in the second simulation.
     simNameForSearch = "";
     if (pathIncludesSimName){
-      simNameForSearch = simName2;
+      simNameForSearch = options$simName2;
     }
-    if(objectType == "Parameter"){
-      secondObject = existsParameter(path_id = paste(simNameForSearch, objectPath, sep = "|"), options = list(Type = "readonly"), DCI_Info = DCI_Info2);
-    }
-    if(objectType == "Species"){
-      secondObject = existsSpeciesInitialValue(path_id = paste(simNameForSearch, objectPath, sep = "|"), options = list(Type = "readonly"), DCI_Info = DCI_Info2);
-    }
-    if(objectType == "Observer"){
-      secondObject = existsObserver(path_id = paste(simNameForSearch, objectPath, sep = "|"), DCI_Info = DCI_Info2);
-    }
+    secondObject = getObjectExistance(objectType = options$objectType, path_id = paste(simNameForSearch, objectPath, sep = "|"), DCI_Info = DCI_Info2);
+    
     if((existsInSecond = secondObject$isExisting)){
       #ID of the object in the second simulation
       idSecond = allObjects2$ID[secondObject$Index];
+      
       #Value of the object in the second simulation
-      secondValue = NaN;
-      if(objectType == "Parameter"){
-        secondValue = getParameter(path_id = idSecond, options = list(Type = "current"), DCI_Info = DCI_Info2)$Value;
-      }
-      if(objectType == "Species"){
-        secondValue = getSpeciesInitialValue(path_id = idSecond, options = list(Type = "current"), DCI_Info = DCI_Info2)$Value;
-      }
+      secondValue = getObjectProperty(objectType = options$objectType, path_id = idSecond, DCI_Info = DCI_Info2, property = "Value");
+      
       #Is the object defined by a formula in the second simulation?
-      isFormulaInSecond = TRUE;
-      if(objectType == "Parameter"){
-        isFormulaInSecond = as.logical(getParameter(path_id = idSecond, options = list(Type = "current", Property = "IsFormula"), DCI_Info = DCI_Info2)$Value);
-      }
-      if(objectType == "Species"){
-        isFormulaInSecond = as.logical(getSpeciesInitialValue(path_id = idSecond, options = list(Type = "current", Property = "IsFormula"), DCI_Info = DCI_Info2)$Value);
-      }
+      isFormulaInSecond = as.logical(getObjectProperty(objectType = options$objectType, path_id = idSecond, DCI_Info = DCI_Info2, property = "IsFormula"));
+      
       #Formula string (empty if the object is non-formula)
       formulaStringSecond = "";
       if(isFormulaInSecond){
-        if(objectType == "Parameter"){
-          formulaStringSecond = getParameter(path_id = idSecond, options = list(Type = "current", Property = "Formula"), DCI_Info = DCI_Info2)$Value;
-        }
-        if(objectType == "Species"){
-          formulaStringSecond = getSpeciesInitialValue(path_id = idSecond, options = list(Type = "current", Property = "Formula"), DCI_Info = DCI_Info2)$Value;
-        }
-        if(objectType == "Observer"){
-          formulaStringSecond = getObserverFormula(path_id = idSecond, DCI_Info = DCI_Info2)$Value;
-        }
+        formulaStringSecond = getObjectProperty(objectType = options$objectType, path_id = idSecond, DCI_Info = DCI_Info2, property = "Formula")
       }
       
       #Compare objects
-      identical = (isTRUE(all.equal.numeric(firstValue, secondValue, tolerance = numTolerance)));
-      if (!ignoreFormula){
+      identical = (isTRUE(all.equal.numeric(firstValue, secondValue, tolerance = options$numTolerance)));
+      if (!options$ignoreFormula){
         identical = (identical & (isFormulaInFirst == isFormulaInSecond) & isTRUE(all.equal.character(formulaStringFirst, formulaStringSecond)));
       }
-      #Mark the object idnex as compared.
+      #Mark the object's idnex as compared.
       idxComparedInSecond = c(idxComparedInSecond, secondObject$Index);
     }
     #Object is not in second simulation
@@ -144,156 +145,52 @@ compareStructures = function(objectType, DCI_Info1, DCI_Info2, simName1, simName
     
     #If the objects are not identical, create an entry in differences-list.
     if( !identical ){
-      objectsPaths = c(objectsPaths, objectPath);
-      existanceInFirst = c(existanceInFirst, existsInFirst);
-      existanceInSecond = c(existanceInSecond, existsInSecond);
-      valuesFirst = c(valuesFirst, firstValue);
-      valuesSecond = c(valuesSecond, secondValue);
-      formulaFlagsFirst = c(formulaFlagsFirst, isFormulaInFirst);
-      formulaFlagsSecond = c(formulaFlagsSecond, isFormulaInSecond);
-      formulaStringsFirst = c(formulaStringsFirst, formulaStringFirst);
-      formulaStringsSecond = c(formulaStringsSecond, formulaStringSecond);
+      objects_diff$Path = c(objects_diff$Path, objectPath);
+      objects_diff$isExistingFirst = c(objects_diff$isExistingFirst, existsInFirst);
+      objects_diff$isExistingSecond = c(objects_diff$isExistingSecond, existsInSecond);
+      objects_diff$ValueFirst = c(objects_diff$ValueFirst, firstValue);
+      objects_diff$ValueSecond = c(objects_diff$ValueSecond, secondValue);
+      objects_diff$IsFormulaFirst = c(objects_diff$IsFormulaFirst, isFormulaInFirst);
+      objects_diff$IsFormulaSecond = c(objects_diff$IsFormulaSecond, isFormulaInSecond);
+      objects_diff$FormulaFirst  = c(objects_diff$FormulaFirst , formulaStringFirst);
+      objects_diff$FormulaSecond = c(objects_diff$FormulaSecond, formulaStringSecond);
     }
   }
   
-  #Iterate through objects from the second simulation that have not been compared and compare them to the objects from the first simulation.
-  for (secondIdx in setdiff(allObjects2$Index, idxComparedInSecond)){
-    #Flag determining whether the objects are identical in both simulations.
-    identical = TRUE;
-    #Flag determining whether the object exists in the second simulation
-    existsInSecond = TRUE;
-    #Get the path of the object
-    objectInfo = splitSimNameFromPath(allObjects1$Path[firstIdx]);
-    objectPath = objectInfo$Path;
-    #Some parameters (e.g., 'AbsTol') do not require the name of the simulation as path prefix.
-    #To correctly construct the path in the other simulation, mark whether addition of simulation name is required.
-    pathIncludesSimName = TRUE;
-    if (! (nchar(objectInfo$SimName) > 0) ){
-      pathIncludesSimName = FALSE;
-    }
-    #ID of the object in the second simulation
-    idSecond = allObjects2$ID[secondIdx];
-    
-    #Value of the object in the second simulation
-    secondValue = NaN;
-    if(objectType == "Parameter"){
-      secondValue = getParameter(path_id = idSecond, options = list(Type = "current"), DCI_Info = DCI_Info2)$Value;
-    }
-    if(objectType == "Species"){
-      secondValue = getSpeciesInitialValue(path_id = idSecond, options = list(Type = "current"), DCI_Info = DCI_Info2)$Value;
-    }
-    
-    #Is the object defined by a formula in the second simulation?
-    isFormulaInSecond = TRUE;
-    if(objectType == "Parameter"){
-      isFormulaInSecond = as.logical(getParameter(path_id = idSecond, options = list(Type = "current", Property = "IsFormula"), DCI_Info = DCI_Info2)$Value);
-    }
-    if(objectType == "Species"){
-      isFormulaInSecond = as.logical(getSpeciesInitialValue(path_id = idSecond, options = list(Type = "current", Property = "IsFormula"), DCI_Info = DCI_Info2)$Value);
-    }
-    #Formula string (empty if the object is non-formula)
-    formulaStringSecond = "";
-    if(isFormulaInSecond){
-      if(objectType == "Parameter"){
-        formulaStringSecond = getParameter(path_id = idSecond, options = list(Type = "current", Property = "Formula"), DCI_Info = DCI_Info2)$Value;
-      }
-      if(objectType == "Species"){
-        formulaStringSecond = getSpeciesInitialValue(path_id = idSecond, options = list(Type = "current", Property = "Formula"), DCI_Info = DCI_Info2)$Value;
-      }
-      if(objectType == "Observer"){
-        formulaStringSecond = getObserverFormula(path_id = idSecond, DCI_Info = DCI_Info2)$Value;
-      }
-    }
-    
-    #Find the object with the same path in the first simulation.
-    simNameForSearch = "";
-    if (pathIncludesSimName){
-      simNameForSearch = simName1;
-    }
-    if(objectType == "Parameter"){
-      firstObject = existsParameter(path_id = paste(simNameForSearch, objectPath, sep = "|"), options = list(Type = "readonly"), DCI_Info = DCI_Info1);
-    }
-    if(objectType == "Species"){
-      firstObject = existsSpeciesInitialValue(path_id = paste(simNameForSearch, objectPath, sep = "|"), options = list(Type = "readonly"), DCI_Info = DCI_Info1);
-    }
-    if(objectType == "Observer"){
-      firstObject = existsObserver(path_id = paste(simNameForSearch, objectPath, sep = "|"), DCI_Info = DCI_Info1);
-    }
-    
-    if((existsInFirst = firstObject$isExisting)){
-      #ID of the object in the first simulation
-      idFirst = allObjects1$ID[firstObject$Index];
-      #Value of the object in the first simulation
-      firstValue = NaN;
-      if(objectType == "Parameter"){
-        firstValue = getParameter(path_id = idFirst, options = list(Type = "current"), DCI_Info = DCI_Info1)$Value;
-      }
-      if(objectType == "Species"){
-        firstValue = getSpeciesInitialValue(path_id = idFirst, options = list(Type = "current"), DCI_Info = DCI_Info1)$Value;
-      }
-      
-      #Is the object defined by a formula in the first simulation?
-      isFormulaInFirst = TRUE;
-      if(objectType == "Parameter"){
-        isFormulaInFirst = as.logical(getParameter(path_id = idFirst, options = list(Type = "current", Property = "IsFormula"), DCI_Info = DCI_Info1)$Value);
-      }
-      if(objectType == "Species"){
-        isFormulaInFirst = as.logical(getSpeciesInitialValue(path_id = idFirst, options = list(Type = "current", Property = "IsFormula"), DCI_Info = DCI_Info1)$Value);
-      }
-      #Formula string (empty if parameter is non-formula)
-      formulaStringFirst = "";
-      if(isFormulaInFirst){
-        if(objectType == "Parameter"){
-          formulaStringFirst = getParameter(path_id = idFirst, options = list(Type = "current", Property = "Formula"), DCI_Info = DCI_Info1)$Value;
-        }
-        if(objectType == "Species"){
-          formulaStringFirst = getSpeciesInitialValue(path_id = idFirst, options = list(Type = "current", Property = "Formula"), DCI_Info = DCI_Info1)$Value;
-        }
-        if(objectType == "Observer"){
-          formulaStringFirst = getObserverFormula(path_id = idFirst, DCI_Info = DCI_Info1)$Value;
-        }
-      }
-      
-      #Compare the objects
-      identical = (isTRUE(all.equal.numeric(firstValue, secondValue, tolerance = numTolerance)));
-      if (!ignoreFormula){
-        identical = (identical & (isFormulaInFirst == isFormulaInSecond) & isTRUE(all.equal.character(formulaStringFirst, formulaStringSecond)));
-      }
-    }
-    #Object is not in first simulation
-    else{
-      identical = FALSE;
-      firstValue = NaN;
-      isFormulaInFirst = NaN;
-      formulaStringFirst = "";
-    }
-    
-    #If the objects are not identical, create an entry in differences-list.
-    if( !identical ){
-      objectsPaths = c(objectsPaths, objectPath);
-      existanceInFirst = c(existanceInFirst, existsInFirst);
-      existanceInSecond = c(existanceInSecond, existsInSecond);
-      valuesFirst = c(valuesFirst, firstValue);
-      valuesSecond = c(valuesSecond, secondValue);
-      formulaFlagsFirst = c(formulaFlagsFirst, isFormulaInFirst);
-      formulaFlagsSecond = c(formulaFlagsSecond, isFormulaInSecond);
-      formulaStringsFirst = c(formulaStringsFirst, formulaStringFirst);
-      formulaStringsSecond = c(formulaStringsSecond, formulaStringSecond);
-    }
-  }
+  return(list(diffs = objects_diff, comparedInSecond = idxComparedInSecond));
+}
+
+#objectType can be "Parameter", "Species", or "Observer"
+compareStructures = function(DCI_Info1, DCI_Info2, options){
+  #Compare all objects from the first simulation to the objects from the second simulation.
+  comparisonResult_first = compareObjects(DCI_Info1 = DCI_Info1, DCI_Info2 = DCI_Info2, options = options);
   
-  objects_diff$Path = objectsPaths;
-  objects_diff$isExistingFirst = existanceInFirst;
-  objects_diff$isExistingSecond = existanceInSecond;
-  objects_diff$ValueFirst = valuesFirst;
-  objects_diff$ValueSecond = valuesSecond;
-  objects_diff$IsFormulaFirst = formulaFlagsFirst;
-  objects_diff$IsFormulaSecond = formulaFlagsSecond;
-  objects_diff$FormulaFirst = formulaStringsFirst;
-  objects_diff$FormulaSecond = formulaStringsSecond;
+  #Compare objects from the second simulation that have not been compared before to the objects from the first simulation.
+  comparisonResult_second = compareObjects(DCI_Info1 = DCI_Info2, DCI_Info2 = DCI_Info1, options = options, excludeIdx = comparisonResult_first$comparedInSecond);
+
+  #Combine results of the comparisons
+  objects_diff = list();
+  objects_diff$Path = c(comparisonResult_first$diffs$Path, comparisonResult_second$diffs$Path);
+  objects_diff$isExistingFirst = c(comparisonResult_first$diffs$isExistingFirst, comparisonResult_second$diffs$isExistingSecond);
+  #Does the object exist in the second simulation?
+  objects_diff$isExistingSecond = c(comparisonResult_first$diffs$isExistingSecond, comparisonResult_second$diffs$isExistingFirst);
+  #Numerical value of the object in the first simulation.
+  objects_diff$ValueFirst = c(comparisonResult_first$diffs$ValueFirst, comparisonResult_second$diffs$ValueSecond);
+  #Numerical value of the object in the second simulation.
+  objects_diff$ValueSecond = c(comparisonResult_first$diffs$ValueSecond, comparisonResult_second$diffs$ValueFirst);
+  #Is the objects value defined by a formula in the first simulation?
+  objects_diff$IsFormulaFirst = c(comparisonResult_first$diffs$IsFormulaFirst, comparisonResult_second$diffs$IsFormulaSecond);
+  #Is the objects value defined by a formula in the second simulation?
+  objects_diff$IsFormulaSecond = c(comparisonResult_first$diffs$IsFormulaSecond, comparisonResult_second$diffs$IsFormulaFirst);
+  #Formula string defining the value of the object in the first simulation. Empty if no formula used.
+  objects_diff$FormulaFirst = c(comparisonResult_first$diffs$FormulaFirst, comparisonResult_second$diffs$FormulaSecond);
+  #Formula string defining the value of the object in the second simulation. Empty if no formula used.
+  objects_diff$FormulaSecond = c(comparisonResult_first$diffs$FormulaSecond, comparisonResult_second$diffs$FormulaFirst);
+
   return(objects_diff);
 }
 
+#Compare output patterns.
 compareSimulationTime = function(simTime1, simTime2){
   identical = TRUE;
   #Compare time pattern by size and element-wise
@@ -303,71 +200,50 @@ compareSimulationTime = function(simTime1, simTime2){
   return(identical);
 }
 
+#Append comparison results of a specific type to a string that will be written to a file.
+appendResultsToString = function(outString, objectsResults){
+  outString = c(outString, paste("Path", "Exists in first", "Exists in second", "Value in first", "Value in second", "Is formula in first", "Is formula in second", "Formula string in first", "Formula string in second", sep = "\t"));
+  if (length(objectsResults) > 0){
+    for (i in 1 : length(objectsResults$Path)){
+      outString = c(outString, paste(
+        objectsResults$Path[i],
+        objectsResults$isExistingFirst[i],
+        objectsResults$isExistingSecond[i],
+        objectsResults$ValueFirst[i],
+        objectsResults$ValueSecond[i],
+        objectsResults$IsFormulaFirst[i],
+        objectsResults$IsFormulaSecond[i],
+        objectsResults$FormulaFirst[i],
+        objectsResults$FormulaSecond[i],
+        sep = "\t"));
+    }
+  }
+  return(outString);
+}
+
+#Write results into a CSV file.
 writeToCSV = function(CSV_path, results){
   dirname <- dirname(CSV_path)
   if (!file.exists(dirname)) {
     dir.create(dirname, recursive=TRUE)
   }
+  
+  #Build the output string.
   outString = "Simulation names";
   outString = c(outString, paste(results$SimNames[1], results$SimNames[2], sep = "\t"));
   
   outString = c(outString, "Parameter differences:");
-  outString = c(outString, paste("Path", "Exists in first", "Exists in second", "Value in first", "Value in second", "Is formula in first", "Is formula in second", "Formula string in first", "Formula string in second", sep = "\t"));
-  if (length(results$Params_diff) > 0){
-    for (i in 1 : length(results$Params_diff$Path)){
-      outString = c(outString, paste(
-        results$Params_diff$Path[i],
-        results$Params_diff$isExistingFirst[i],
-        results$Params_diff$isExistingSecond[i],
-        results$Params_diff$ValueFirst[i],
-        results$Params_diff$ValueSecond[i],
-        results$Params_diff$IsFormulaFirst[i],
-        results$Params_diff$IsFormulaSecond[i],
-        results$Params_diff$FormulaFirst[i],
-        results$Params_diff$FormulaSecond[i],
-        sep = "\t"));
-    }
-  }
-  
+  outString = appendResultsToString(outString = outString, objectsResults = results$Params_diff);
+
   outString = c(outString, "Species differences:");
-  outString = c(outString, paste("Path", "Exists in first", "Exists in second", "Value in first", "Value in second", "Is formula in first", "Is formula in second", "Formula string in first", "Formula string in second", sep = "\t"));
-  if (length(results$Species_diff) > 0){
-    for (i in 1 : length(results$Species_diff$Path)){
-      outString = c(outString, paste(
-        results$Species_diff$Path[i],
-        results$Species_diff$isExistingFirst[i],
-        results$Species_diff$isExistingSecond[i],
-        results$Species_diff$ValueFirst[i],
-        results$Species_diff$ValueSecond[i],
-        results$Species_diff$IsFormulaFirst[i],
-        results$Species_diff$IsFormulaSecond[i],
-        results$Species_diff$FormulaFirst[i],
-        results$Species_diff$FormulaSecond[i],
-        sep = "\t"));
-    }
-  }
+  outString = appendResultsToString(outString = outString, objectsResults = results$Species_diff);
   
   outString = c(outString, "Observer differences:");
-  outString = c(outString, paste("Path", "Exists in first", "Exists in second", "Value in first", "Value in second", "Is formula in first", "Is formula in second", "Formula string in first", "Formula string in second", sep = "\t"));
-  if (length(results$Observer_diff) > 0){
-    for (i in 1 : length(results$Observer_diff$Path)){
-      outString = c(outString, paste(
-        results$Observer_diff$Path[i],
-        results$Observer_diff$isExistingFirst[i],
-        results$Observer_diff$isExistingSecond[i],
-        results$Observer_diff$ValueFirst[i],
-        results$Observer_diff$ValueSecond[i],
-        results$Observer_diff$IsFormulaFirst[i],
-        results$Observer_diff$IsFormulaSecond[i],
-        results$Observer_diff$FormulaFirst[i],
-        results$Observer_diff$FormulaSecond[i],
-        sep = "\t"));
-    }
-  }
+  outString = appendResultsToString(outString = outString, objectsResults = results$Observer_diff);
+  
   outString = c(outString, paste0("Time pattern identical\t", results$TimeIdentical));
   
-  
-  write.table(x = outString, file = resultsCSV_path, row.names = FALSE, col.names = FALSE, dec = ",");
+  write.table(x = outString, file = CSV_path, row.names = FALSE, col.names = FALSE, dec = ",");
 }
 
 #' Compares two simulations for differences.
@@ -380,7 +256,7 @@ writeToCSV = function(CSV_path, results){
 #' @param DCI_Info1 DCI_Info of the first simulation
 #' @param DCI_Info2 DCI_Info of the second simulation
 #' @param numTolerance Maximal numeric deviation which is accepted as equal. Default value is 1e-8.
-#' @param resultsCSV_path A path to a file where the results of the comparison are writen to. If emtpy, no output into a file is performed. If a file with the given path exists, it will be 
+#' @param resultsCSV_path A path to a tab-separated file where the results of the comparison are writen to. If emtpy, no output into a file is performed. If a file with the given path exists, it will be 
 #' overwritten; otherwise, a new file is created. Emtpy by default.
 #' @param ignoreFormula If true, only values of parameters or molecule start values are compared. If false, formula strings are compared. FALSE by default.
 #'
@@ -394,8 +270,8 @@ writeToCSV = function(CSV_path, results){
 #' 'ValueSecond' value of the object in the second simulation,
 #' 'IsFormulaFirst' boolean value whether the object is defined by a formula in the first simulation,
 #' 'IsFormulaSecond' boolean value whether the object is defined by a formula in the second simulation,
-#' 'FormulaFirst' string reprentation of the parameter value in the first simulation (empty if parameter is not defined by a formula),
-#' 'FormulaSecond' string reprentation of the parameter value in the second simulation (empty if parameter is not defined by a formula).
+#' 'FormulaFirst' string reprentation of the object's formula in the first simulation (empty if object is not defined by a formula),
+#' 'FormulaSecond' string reprentation of the object's formula in the second simulation (empty if object is not defined by a formula).
 #' 'TimeIdentical' is a boolean defining whether the time-patterns are equal in both simulations.
 #' If DCI_Info1 and DCI_Info2 have the same handle-ID, identity of the simulations is assumed without comparison.
 #' If no differences are found, an empty list is returned for the corresponding entry (parameters, species, observers).
@@ -473,20 +349,17 @@ compareSimulations = function(DCI_Info1 = {}, DCI_Info2 = {}, numTolerance = 1e-
   }
   
   #Compare parameters, species, and observers.
-  params_diff = compareStructures("Parameter", DCI_Info1, DCI_Info2, numTolerance = numTolerance, simName1 = simName1, simName2 = simName2, ignoreFormula = ignoreFormula);
-  species_diff = compareStructures("Species", DCI_Info1, DCI_Info2, numTolerance = numTolerance, simName1 = simName1, simName2 = simName2, ignoreFormula = ignoreFormula);
-  observer_diff = compareStructures("Observer", DCI_Info1, DCI_Info2,numTolerance = numTolerance, simName1 = simName1, simName2 = simName2, ignoreFormula = ignoreFormula);
+  comparisonOptions = list(objectType = "Parameter", simName1 = simName1, simName2 = simName2, ignoreFormula = ignoreFormula, numTolerance = numTolerance);
+  results$Params_diff = compareStructures(DCI_Info1 = DCI_Info1, DCI_Info2 = DCI_Info2, options = comparisonOptions);
+  comparisonOptions$objectType = "Species";
+  results$Species_diff = compareStructures(DCI_Info1 = DCI_Info1, DCI_Info2 = DCI_Info2, options = comparisonOptions);
+  comparisonOptions$objectType = "Observer";
+  results$Observer_diff = compareStructures(DCI_Info1 = DCI_Info1, DCI_Info2 = DCI_Info2, options = comparisonOptions);
   
   #Compare simulation time
   simTime1 = getSimulationTime(DCI_Info = DCI_Info1);
   simTime2 = getSimulationTime(DCI_Info = DCI_Info2);
-  timeIdentical = compareSimulationTime(simTime1, simTime2);
-  
-  #Store parameter differences
-  results$Params_diff = params_diff;
-  results$Species_diff = species_diff;
-  results$Observer_diff = observer_diff;
-  results$TimeIdentical = timeIdentical;
+  results$TimeIdentical = compareSimulationTime(simTime1, simTime2);
   
   #If a path to output file a specified, write the results into a CSV-file.
   if (!resultsCSV_path == "")

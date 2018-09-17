@@ -1,6 +1,7 @@
 #require(RUnit, quietly=TRUE)
 #require(MoBiToolboxForR, quietly=TRUE)
 simModelXML <- "./tests/models/black american girl.xml"
+standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
 
 obsPath1 = "black american girl|Organism|PeripheralVenousBlood|MoleculeProperties|my Compound|OBSBloodCells";
 obsID1 = 97;
@@ -17,12 +18,12 @@ test.EmptyDCI_Info <- function() {
 }
 
 test.NotSimulated <- function() {
-  standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none")
-  dci_info <- standard_dci_info
+  dci_info <- standard_dci_info;
   checkException(getSimulationResult(DCI_Info=dci_info))
 }
 
 test.byPathSpecies = function(){
+  dci_info <- processSimulation(DCI_Info = standard_dci_info);
   #existent
   endResult = getEndSimulationResult(path_id = speciesPath1, DCI_Info = dci_info);
   result = getSimulationResult(path_id = speciesPath1, DCI_Info = dci_info);
@@ -33,6 +34,7 @@ test.byPathSpecies = function(){
 }
 
 test.byIDSpecies = function(){
+  dci_info <- processSimulation(DCI_Info = standard_dci_info);
   #existent
   endResult = getEndSimulationResult(path_id = speciesID1, DCI_Info = dci_info);
   result = getSimulationResult(path_id = speciesID1, DCI_Info = dci_info);
@@ -53,6 +55,7 @@ test.byIDSpecies = function(){
 }
 
 test.byPathObserver = function(){
+  dci_info <- processSimulation(DCI_Info = standard_dci_info);
   #existent
   endResult = getEndSimulationResult(path_id = obsPath1, DCI_Info = dci_info);
   result = getSimulationResult(path_id = obsPath1, DCI_Info = dci_info);
@@ -63,6 +66,7 @@ test.byPathObserver = function(){
 }
 
 test.byIDObserver = function(){
+  dci_info <- processSimulation(DCI_Info = standard_dci_info);
   #existent
   endResult = getEndSimulationResult(path_id = obsID1, DCI_Info = dci_info);
   result = getSimulationResult(path_id = obsID1, DCI_Info = dci_info);
