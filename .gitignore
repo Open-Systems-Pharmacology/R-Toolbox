@@ -3,3 +3,4 @@ setup/deploy/
 MoBiToolBoxForR/
 MoBiToolBoxForR_*
 .Rproj.user
+/tests/Protocol.html
