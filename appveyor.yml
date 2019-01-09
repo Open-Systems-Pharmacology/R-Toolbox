@@ -1,9 +1,8 @@
 environment:
-  app_version: '7.3.0'
   R_INSTALL_DIR: 'C:\ProgramData\R\'
   R_TOOLS_INSTALL_DIR: 'C:\ProgramData\RTools\'
 
-version: '%app_version%.{build}'
+version: '7.4.0.{build}'
 
 branches:
   only:
@@ -11,20 +10,22 @@ branches:
 
 skip_tags: true
 
+pull_requests: 
+  do_not_increment_build_number: true     
+
 skip_commits:
   files:
     - '*.md'
 
 install:
-  - set PATH=C:\Ruby22\bin;%R_INSTALL_DIR%bin\i386;%R_TOOLS_INSTALL_DIR%bin;%PATH%
+  - set PATH=C:\Ruby22\bin;%R_INSTALL_DIR%bin\x64;%R_TOOLS_INSTALL_DIR%bin;%PATH%
   - git submodule update --init --recursive
   - ps: >-
-      (new-object net.webclient).DownloadFile('https://cran.r-project.org/bin/windows/base/old/3.3.1/R-3.3.1-win.exe', 'C:\R.exe')
+      (new-object net.webclient).DownloadFile('https://cran.r-project.org/bin/windows/base/R-3.5.1-win.exe', 'C:\R.exe')
 
       Start-Process C:\R.exe -ArgumentList /VERYSILENT, /DIR=$env:R_INSTALL_DIR -Wait
-
   - ps: >-
-      (new-object net.webclient).DownloadFile(' https://cran.r-project.org/bin/windows/Rtools/Rtools33.exe', 'C:\\Rtools.exe')
+      (new-object net.webclient).DownloadFile(' https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe', 'C:\\Rtools.exe')
 
       Start-Process C:\Rtools.exe -ArgumentList /VERYSILENT, /DIR=$env:R_TOOLS_INSTALL_DIR -Wait      
 

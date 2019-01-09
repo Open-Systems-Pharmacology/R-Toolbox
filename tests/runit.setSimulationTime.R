@@ -101,10 +101,10 @@ test.SetSimulationTimePointsAndSimulate <- function(){
   #first 8 hours hourly 
   timepoints <- c((0:7)*60)
   dci_info <- setSimulationTime(c(1:60, timepoints=(0:7)*60), DCI_Info=dci_info)
-  processSimulation(DCI_Info=dci_info)
+  dci_info = processSimulation(DCI_Info=dci_info);
   
   dci_info <- setSimulationTime(c(1:60), DCI_Info=dci_info)
-  processSimulation(DCI_Info=dci_info) # that failes currently with 
+  dci_info = processSimulation(DCI_Info=dci_info) # that failes currently with 
   # "Error in processSimulation(DCI_Info = dci_info) : "
   # "Unknown interval distribution type passed: ''"
   

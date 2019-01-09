@@ -20,10 +20,6 @@ existsObserver <- function(path_id = "*",  options = {}, DCI_Info = {})
 			options<-c(options, isReference = FALSE)
 		}
 	}
-	if (!(toupper(options$Type) %in% c("VARIABLE", "READONLY"))	)
-	{
-	  stop("Invalid type provided. Use one of the following: variable, readonly.")
-	}
   
   id <- 5
 	if (options$isReference == FALSE)

@@ -20,8 +20,6 @@ If a numerical vector is provided all observers which id is in the vector are ch
   \item{options}{
 Following options are supported: 
 
-Type ("variable" or "readonly"), Default is "variable".
-
 isReference (TRUE or FALSE), Default is FALSE.
 }
 
@@ -56,7 +54,6 @@ Open Systems Pharmacology Suite Community, https://github.com/Open-Systems-Pharm
 \examples{
 # checks the existence of observer with ID 147.
 existenceInfo <- existsObserver(path_id = 147, 
-								options = list(Type = "readonly"), 
 								DCI_Info = dci_info)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

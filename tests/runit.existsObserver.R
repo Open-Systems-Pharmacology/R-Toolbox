@@ -14,16 +14,14 @@ test.EmptyDCI_Info <- function() {
 
 test.CheckParameterInSimulation <- function() {
   dci_info <- standard_dci_info
-  options <- list(Type="readonly")
   
-  check <- existsObserver(path_id=97, DCI_Info = dci_info, options=options)
+  check <- existsObserver(path_id=97, DCI_Info = dci_info)
   checkTrue(check$isExisting)
   checkEquals(check$ID, 97)
   checkEquals(check$ID, dci_info$InputTab$AllObservers$ID[check$Index])
   checkEquals(check$Path, dci_info$InputTab$AllObservers$Path[check$Index])
-  
-  options <- list(Type="readonly")
-  check <- existsObserver(path_id=109, DCI_Info = dci_info, options=options)
+
+  check <- existsObserver(path_id=109, DCI_Info = dci_info)
   checkTrue(check$isExisting)
   checkEquals(check$ID, 109)
   checkEquals(check$ID, dci_info$InputTab$AllObservers$ID[check$Index])
@@ -33,8 +31,7 @@ test.CheckParameterInSimulation <- function() {
 
 test.CheckParameterInSimulationNonevariables <- function() {
   dci_info <- standard_dci_info
-  options <- list(Type="readonly")
-  check <- existsObserver(path_id=97, DCI_Info = dci_info, options=options)
+  check <- existsObserver(path_id=97, DCI_Info = dci_info)
   checkTrue(check$isExisting)
   checkEquals(check$ID, 97)
   checkEquals(check$ID, dci_info$InputTab$AllObservers$ID[check$Index])
@@ -43,7 +40,7 @@ test.CheckParameterInSimulationNonevariables <- function() {
 
 test.CheckParameterInSimulationNonevariablesIsReference <- function() {
   dci_info <- standard_dci_info
-  options <- list(Type="readonly", isReference=TRUE)
+  options <- list(isReference=TRUE)
   check <- existsObserver(path_id=97, DCI_Info = dci_info, options = options)
   checkTrue(check$isExisting)
   checkEquals(check$ID, 97)
