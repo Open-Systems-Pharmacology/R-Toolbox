@@ -4,7 +4,7 @@ updateSimulationInputs <- function(DCI_Info = {})
 	variableTableIndexes <- grep("VARIABLE", toupper(names(DCI_Info$InputTab)), fixed=TRUE)
 	for (i in variableTableIndexes)
 	{
-		if (length(DCI_Info$InputTab[[i]]$Path))
+		if (length(DCI_Info$InputTab[[i]]$ID))
 		{
 			h <- .Call("RDCI_SetInputTable", as.integer(DCI_Info$Handle),as.integer(i),DCI_Info$InputTab[[i]])
 			if (h == 0)
