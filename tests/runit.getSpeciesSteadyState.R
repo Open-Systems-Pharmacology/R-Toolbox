@@ -1,6 +1,7 @@
 #require(RUnit, quietly=TRUE)
 #require(MoBiToolboxForR, quietly=TRUE)
 simModelXML <- "./tests/models/black american girl.xml"
+standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none");
 
 test.EmptyDCI_Info <- function() {
   checkException(getSpeciesSteadyState(DCI_Info = {}))
@@ -9,7 +10,6 @@ test.EmptyDCI_Info <- function() {
 #Check behavior when no species provided. ATM, steady-state for all species should be provided.
 #However, the correct behavior would be only to return values of non-formula species.
 test.emptySpecies = function(){
-  standard_dci_info <- initSimulation(XML=simModelXML, whichInitParam="none");
   allSpecies = existsSpeciesInitialValue(path_id = "*", DCI_Info = standard_dci_info);
   steadyState = getSpeciesSteadyState(DCI_Info = standard_dci_info, steadyStateTime = 1000);
   
