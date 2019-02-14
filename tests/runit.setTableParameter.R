@@ -140,3 +140,41 @@ test.CheckParameterInSimulationNoneVariables <- function() {
 
   checkException(setTableParameter(table=values, DCI_Info = dci_info, options=options))
 }
+
+#Test for new values applied in the simulation
+test.CheckNewValues = function(){
+  paramPath = "*|Applications|T1|Fraction (dose)";
+  #Initialize the table parameter
+  initStruct = list();
+  initStruct = initParameter(initStruct = initStruct, path_id = paramPath);
+  #Initialize simulation
+  myDCI = initSimulation(XML = simModelXML, ParamList = initStruct);
+  
+  #Simulate and plot the value defined by the table parameter
+  myDCI = processSimulation(DCI_Info = myDCI);
+
+  #First, get the current table of the parameter of interest. This will be the table we will edit and re-write into the DCI.
+  tableParam_old = getTableParameter(path_id = paramPath, DCI_Info = myDCI);
+  
+  #Change the table
+  #Get the length of the table
+  table_length = length(tableParam_old$Time);
+  new_time = c(0, 30, 250);
+  new_values = c(2, 1.5,7);
+  #Change the time and values of the table
+  for (i in 1:table_length){
+    tableParam_old$Time[i] = new_time[i];
+    tableParam_old$Value[i] = new_values[i];
+  }
+  
+  #Update the table of a parameter
+  myDCI = setTableParameter(table = tableParam_old, DCI_Info = myDCI);
+  
+  #Simulate with new table values
+  myDCI = processSimulation(DCI_Info = myDCI);
+
+  #Check the new table parameter
+  tableParam_new = getTableParameter(path_id = paramPath, DCI_Info = myDCI);
+  checkEqualsNumeric(tableParam_new$Time, new_time);
+  checkEqualsNumeric(tableParam_new$Value, new_values);
+}
