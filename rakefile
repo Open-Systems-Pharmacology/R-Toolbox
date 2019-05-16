@@ -131,7 +131,7 @@ def copy_setup_files
     copy_files "OSPSuite.SimModelComp#{architecture}", 'dll'
     copy_files "OSPSuite.SimModel#{architecture}", 'dll'
     copy_files "OSPSuite.FuncParser#{architecture}", 'dll'
-    copy_files "OSPSuite.SimModelSolver_CVODES282#{architecture}", 'dll'    
+    copy_files "OSPSuite.SimModelSolver_CVODES#{architecture}", 'dll'    
   end
 
   copy_depdencies lib_dir, toolbox_src_dir do
