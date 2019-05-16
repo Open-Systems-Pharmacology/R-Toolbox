@@ -2,7 +2,7 @@ environment:
   R_INSTALL_DIR: 'C:\ProgramData\R\'
   R_TOOLS_INSTALL_DIR: 'C:\ProgramData\RTools\'
 
-version: '7.5.0.{build}'
+version: "8.0.{build}"
 
 branches:
   only:
@@ -10,12 +10,12 @@ branches:
 
 skip_tags: true
 
-pull_requests: 
-  do_not_increment_build_number: true     
+pull_requests:
+  do_not_increment_build_number: true
 
 skip_commits:
   files:
-    - '*.md'
+    - "*.md"
 
 install:
   - set PATH=C:\Ruby22\bin;%R_INSTALL_DIR%bin\x64;%R_TOOLS_INSTALL_DIR%bin;%PATH%
@@ -30,9 +30,9 @@ install:
       Start-Process C:\Rtools.exe -ArgumentList /VERYSILENT, /DIR=$env:R_TOOLS_INSTALL_DIR -Wait      
 
 before_build:
-  - nuget sources add -name funcparser -source https://ci.appveyor.com/nuget/ospsuite-funcparser 
+  - nuget sources add -name funcparser -source https://ci.appveyor.com/nuget/ospsuite-funcparser
   - nuget sources add -name simmodel -source https://ci.appveyor.com/nuget/ospsuite-simmodel
-  - nuget sources add -name cvodes -source https://ci.appveyor.com/nuget/ospsuite-simmodel-solver-cvodes-282
+  - nuget sources add -name cvodes -source https://ci.appveyor.com/nuget/ospsuite-simmodel-solver-cvodes
   - nuget restore -PackagesDirectory packages
 
 build_script:
@@ -40,11 +40,10 @@ build_script:
   - 7z a setup.zip %APPVEYOR_BUILD_FOLDER%\setup\deploy\*.msi
 
 artifacts:
-  - path: '*.zip'  
-    name: 'package'
+  - path: "*.zip"
+    name: "package"
 
 notifications:
   - provider: Slack
-    incoming_webhook:      
-      secure: 4MH9Em6TtrKalq6808dhPOqypTfYBJvVlqPaa9akNyF1h7st5qNdNezFp6T+bWXqrcZ4q/smtPcJ7LkUFHL46JDYUFlIL8FDz+ApX/vP+x0=
-    
+    incoming_webhook:
+      secure: 4MH9Em6TtrKalq6808dhPOqypTfYBJvVlqPaa9akNyFEAs8X080yIO8g1FLt3tNfBN4OpeBnkgrXzf7AqNKV5561x7Coux3ByGrHmsL1sCo=
