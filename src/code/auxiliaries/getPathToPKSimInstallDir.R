@@ -97,7 +97,7 @@
     # match version
     full.match <- grep(pksim.version, full.match, fixed=TRUE, value=TRUE)
     if (length(full.match) > 1)
-      warning("Ambiguous matches for PK-Sim installation path found.")
+      warning("Ambiguous matches for PK-Sim installation path found. First match is returned.")
     
     return(.homogenizePath(full.match[1]))
   }
@@ -122,17 +122,17 @@
 #' @examples
 #' path = .getpathToPKSimInstallDir("7.4")
 #' path2 = .getpathToPKSimInstallDir("7.5", "C:/MyOSPFolder/")
-#' 
+#'
 .getpathToPKSimInstallDir <- function(pksim.version, 
                                       base.search.folder = Sys.getenv("ProgramW6432")) {
   
-  reg.path <- .getpathToPKSimInstallDirFromRegistry(pksim.version)
-  if (!is.na(reg.path))
-    return(reg.path)
+  pksim.path <- .getpathToPKSimInstallDirFromRegistry(pksim.version)
+  if (!is.na(pksim.path))
+    return(pksim.path)
   
-  reg.path <- .getpathToPKSimInstallDirFromFileSystem(pksim.version, base.search.folder)
-  if (!is.na(reg.path))
-    return(reg.path)
+  pksim.path <- .getpathToPKSimInstallDirFromFileSystem(pksim.version, base.search.folder)
+  if (!is.na(pksim.path))
+    return(pksim.path)
   
   return(NA)
 }
