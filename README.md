@@ -1,4 +1,4 @@
-# R-Toolbox
+# OLD version of the R-toolbox (based on the OSP Suite 8 and below). New version of the R-Toolbox (OSP 9 and above) can be found in the [OSPSuite-R repository](https://github.com/Open-Systems-Pharmacology/ospsuite-R) 
 
 ## About the Toolbox
 The R Toolbox is a collection of R functions which allows the processing of models developed in PK-Sim® or MoBi® from within R. A variety of functions is offered to manipulate models, to simulate models, and to handle simulation results. 
